@@ -1,5 +1,6 @@
-from src.function import Function
+#from src.function import function
 
-class Include(Function):
-    def __init__(self):
-        pass
+#@function
+def include(root):
+    while True:
+        token = (yield)

@@ -1,8 +1,8 @@
-class Error(Exception):
+class DMLError(Exception):
     """Base class for exceptions in this module."""
     pass
 
-class DMLSyntaxError(Error):
+class DMLSyntaxError(DMLError):
     """Exception raised for errors in the DML syntax.
 
     Attributes:
@@ -17,7 +17,7 @@ class DMLSyntaxError(Error):
     def __str__(self):
         return "unexpected token '{0}', expected '{1}'".format(self.is_expr, self.should_be_expr)
                 
-class DMLFunctionNameError(Error):
+class DMLFunctionNameError(DMLError):
     """Exception raised if function names are not defined
 
     Attributes:
@@ -29,4 +29,3 @@ class DMLFunctionNameError(Error):
         
     def __str__(self):
         return "function name'{0}' is not defined".format(self.name)
-                

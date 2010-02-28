@@ -24,8 +24,8 @@ from optparse import OptionParser
 
 if __name__ == '__main__':   
     parser = OptionParser(usage="dml [options] FILE")
-    parser.add_option("-p", "--pdf", dest="pdf", help="generate PDF ouput")
-    parser.add_option("-t", "--html", dest="html", help="generate HTML ouput")
+    parser.add_option("-p", "--pdf", dest="pdf", action="store_true", default=False, help="generate PDF ouput")
+    parser.add_option("-t", "--html", dest="html", action="store_true", default=False, help="generate HTML ouput")
     parser.add_option("-q", "--quiet", action="store_false", dest="verbose", default=True, help="don't print status messages to stdout")
     (options, args) = parser.parse_args()
     if not args:

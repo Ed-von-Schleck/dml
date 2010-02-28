@@ -1,26 +1,22 @@
-!config {
-output: pdf, html
+@meta {
+output = pdf html
 table_of_contents: true
 }
 
-
-The Short, But Complete Play
-============================
+= The Short, But Complete Play =
 or Whatever A Subtitle Might Add In Subtlety
 
 author: Ed von Schleck
 date: February 26th, 2010
 
-Cast
-****
+== Cast ==
 
 Ed: a charmful hero
 Lara: a princess
 Bill, Bill the dragon: the dragon
 the Spanish Inquisition
 
-ACT I
------
+=== ACT I ===
 
 It was a dark and stormy night. Ed sat on his computer and hacked a parser
 for a markup language he had yet to invent. Suddenly he heard a pained scream.
@@ -30,8 +26,7 @@ Ed: <walks to his window> What was that?
 Lara: <being dragged away by a dragon> Help me! <off>
 Ed: For great Justice!
 
-ACT II
-------
+=== ACT II ===
 
 In the dragons lair.
 
@@ -55,8 +50,7 @@ Inquisition!
 
 pause
 
-ACT III
--------
+=== ACT III ===
 
 Bill, the dragon lies on the floor, dead.
 
@@ -64,4 +58,4 @@ Lara: Thank you for rescuing me! It's OK that you took the narrativ shortcut
 to fight Bill while everyone was outside downing a few beers.
 Ed: Yeah, let's go home, I've got a parser to write.
 
-Everybody happy.
+drop.

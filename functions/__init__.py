@@ -1,6 +1,6 @@
-__all__ = ["config", "include"]
+__all__ = ["meta"]
 
-import config, include
+import meta
 
-__function_objs = [config.Config(), include.Include()]
-functions = dict(zip(__all__, __function_objs))
+__function_parsers = [meta.meta]
+functions = dict(zip(__all__, __function_parsers))
