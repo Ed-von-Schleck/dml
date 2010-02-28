@@ -14,9 +14,9 @@ def main(dml_file, options):
         for token in tokenizer:
             #out(token)
             if token[0] == "!":
-                if token[1:] in functions.functions:
-                    open_brackets = tokenizer.next()
-                    if open_brackets != "{":
-                        raise DMLSyntaxError(open_brackets, "{")
-             else:
-                 raise DMLFunctionNameError(token[1:])
+                if token[1:] not in functions.functions:
+                    raise DMLFunctionNameError(token[1:])
+                open_brackets = tokenizer.next()
+                if open_brackets != "{":
+                    raise DMLSyntaxError(open_brackets, "{")
+                    
