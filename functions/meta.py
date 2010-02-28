@@ -10,15 +10,16 @@ def meta(broadcaster):
     try:
         while True:
             token = (yield)
-            #print(token)
             if token == "\n" or token == ";":
                 if not key and not values:
                     continue
                 if bool(key) != bool(values):
                     raise DMLConfigSyntaxError("no key or value(s) defined")
-                if key.lower() == "output":
-                    for value in values:
-                        broadcaster.send((constants.OUTPUT, value))
+                
+                switch = {"output": constants.OUTPUT,
+                          "table_of_contents": constants.TOC}
+                for value in values:
+                    broadcaster.send((switch[key], value))
                 pointer = KEY
                 key = ""
                 values = []
@@ -32,9 +33,9 @@ def meta(broadcaster):
                 if pointer == KEY:
                     if key != "":
                         raise DMLConfigSyntaxError("a key is already defined")
-                    key = token
+                    key = token.lower()
                 else:
-                    values.append(token)
+                    values.append(token.lower())
     except GeneratorExit:
         if not key and not values:
             return
