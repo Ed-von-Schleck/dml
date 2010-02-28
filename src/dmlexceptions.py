@@ -17,3 +17,16 @@ class DMLSyntaxError(Error):
     def __str__(self):
         return "unexpected token '{0}', expected '{1}'".format(self.is_expr, self.should_be_expr)
                 
+class DMLFunctionNameError(Error):
+    """Exception raised if function names are not defined
+
+    Attributes:
+        name -- undefined function
+    """
+
+    def __init__(self, name):
+        self.name = name
+        
+    def __str__(self):
+        return "function name'{0}' is not defined".format(self.name)
+                

@@ -1,7 +1,7 @@
 from __future__ import print_function
 
 from tokenizer import Tokenizer
-from dmlexceptions import DMLSyntaxError
+from dmlexceptions import DMLSyntaxError, DMLFunctionNameError
 import functions
 
 def main(dml_file, options):
@@ -19,4 +19,4 @@ def main(dml_file, options):
                     if open_brackets != "{":
                         raise DMLSyntaxError(open_brackets, "{")
              else:
-                 pass
+                 raise DMLFunctionNameError(token[1:])
