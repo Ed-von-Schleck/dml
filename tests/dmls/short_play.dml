@@ -1,4 +1,4 @@
-!header {
+!config {
 output: pdf, html
 table_of_contents: true
 }
