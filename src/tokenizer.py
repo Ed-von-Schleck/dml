@@ -7,7 +7,6 @@ class Tokenizer(object):
         self._lex_file = shlex.shlex(dml)
         self._lex_file.whitespace_split = False
         self._lex_file.whitespace = " \t\r"
-        self._lex_file.wordchars += "-=*"
 
     def __iter__(self):
         return self

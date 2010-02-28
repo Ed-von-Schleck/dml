@@ -1,5 +1,5 @@
 @meta {
-output = pdf html
+output = dml
 table_of_contents: true
 }
 

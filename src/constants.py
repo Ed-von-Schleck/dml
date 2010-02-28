@@ -1,1 +1,1 @@
-OUTPUT, TOC, TITLE, CAST = range(4)
+OUTPUT, TOC, TITLE, CAST, ACT = range(5)

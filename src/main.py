@@ -38,8 +38,20 @@ def main(dml_file, options):
                         pass
                     finally:
                         function_dispatch.close()
-                else:
-                    buffer.append(token)
+                elif token == "=":
+                    token = tokenizer.next()
+                    if token != "=":
+                        token = tokenizer.next()
+                        if token != "=":
+                            broadcaster.send((constants.TITLE, token))
+                    else:
+                        token = tokenizer.next()
+                        if token != "=":
+                            broadcaster.send((constants.CAST, token))
+                        else:
+                            if token != "=":
+                                broadcaster.send((constants.ACT, token))
+                    
         print("closed", dml_file)
     except DMLError as dml_error:
         import linecache, sys
