@@ -3,7 +3,6 @@ from __future__ import print_function
 import src.states as states
 import src.constants as constants
 
-
 NAME = "stop if not requested in HEAD"
 SHORTNAME = "stop_if_not_requested"
 

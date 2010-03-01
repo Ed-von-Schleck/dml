@@ -5,13 +5,13 @@ from collections import namedtuple
 import sinks
 import states
 
-def broadcast():
+def broadcast(path, filename):
     MySink = namedtuple("MySink", "mod cor filters")
     mysinks = []
     for sink_name in sinks.__all__:
         filters = []
         mod = sinks.__dict__[sink_name]
-        cor = mod.sink()
+        cor = mod.sink(path, filename)
         cor.next()
         number_of_filters = len(mod.filters)
         for i in range(number_of_filters):
@@ -29,7 +29,10 @@ def broadcast():
         closed_sinks = []
         for sink in mysinks:
             try:
-                sink.filters[0].send((state, event, key, value))
+                if sink.filters:
+                    sink.filters[0].send((state, event, key, value))
+                else:
+                    sink.cor.send((state, event, key, value))
             except StopIteration:
                 sink.cor.close()
                 for filter in sink.filters:

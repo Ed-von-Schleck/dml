@@ -1,7 +1,7 @@
 from __future__ import print_function
 
 import sys
-import os
+import os, os.path
 from collections import deque
 
 from tokenizer import Tokenizer
@@ -18,8 +18,10 @@ class NullDevice():
 def main(dml_file, options):
     if not options.verbose:
         sys.stdout = NullDevice()
-        
-    broadcaster = broadcast()
+    
+    filename, ext = os.path.splitext(os.path.basename(dml_file))
+    path = os.getcwd()
+    broadcaster = broadcast(path, filename)
     broadcaster.next()
     
     try:
@@ -85,14 +87,9 @@ def main(dml_file, options):
                                         else:
                                             raise DMLSyntaxError(token, "==")
                 elif token == "\n":
-                    try:
-                        token = tokenizer.next()
-                    except StopIteration:
-                        broadcaster.send((events.END, None, None))
-                        break
-                    broadcaster.send((events.BODY, constants.BODY, token))
+                    broadcaster.send((events.BODY, constants.NEWLINE, token))
                 else:
-                    broadcaster.send((events.BODY, constants.BODY, token))
+                    broadcaster.send((events.BODY, constants.TOKEN, token))
             broadcaster.send((events.END, None, None))
         print("closed", dml_file)
     except DMLError as dml_error:
