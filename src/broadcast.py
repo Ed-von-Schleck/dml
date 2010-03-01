@@ -1,25 +1,41 @@
 from __future__ import print_function
 
+from collections import namedtuple
+
 import sinks
 import states
 
 def broadcast():
-    sinc_cos = [sink_func() for sink_func in sinks.sinks]
-    for sink in sinc_cos:
-        sink.next()
+    MySink = namedtuple("MySink", "mod cor filters")
+    mysinks = []
+    for sink_name in sinks.__all__:
+        filters = []
+        mod = sinks.__dict__[sink_name]
+        cor = mod.sink()
+        cor.next()
+        number_of_filters = len(mod.filters)
+        for i in range(number_of_filters):
+            target = cor if i + 1 >= number_of_filters else mod.filters[i + 1]
+            filter = mod.filters[i](target, mod.SHORTNAME)
+            filter.next()
+            filters.append(filter)
+        mysinks.append(MySink(mod, cor, filters))
+
     state_machine = states.state_tracker()
     state = state_machine.next()
     while True:
         event, key, value = (yield)
         state = state_machine.send(event)
         closed_sinks = []
-        for sink in sinc_cos:
+        for sink in mysinks:
             try:
-                sink.send((state, event, key, value))
+                sink.filters[0].send((state, event, key, value))
             except StopIteration:
-                sink.close()
+                sink.cor.close()
+                for filter in sink.filters:
+                    filter.close()
                 closed_sinks.append(sink)
         if closed_sinks:
             for sink in closed_sinks:
-                sinc_cos.remove(sink)
+                mysinks.remove(sink)
             closed_sinks = []
