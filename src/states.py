@@ -61,7 +61,8 @@ class DMLStateTransitionError(DMLError):
     """Exception raised if an event was sent that doesn't match with a valid transition
 
     Attributes:
-        name -- undefined function
+        state -- starting state
+        event -- invalid event
     """
     def __init__(self, state, event):
         self.state = state
