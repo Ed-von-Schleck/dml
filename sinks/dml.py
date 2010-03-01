@@ -11,6 +11,8 @@ import src.constants as constants
 import src.states as states
 
 def dml():
-    state = states.START
+    state_machine = states.state_tracker()
+    state = state_machine.next()
     while True:
-        event, key, value = (yield)
+        state, event, key, value = (yield)
+        print(state, event, key, value)

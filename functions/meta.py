@@ -1,6 +1,7 @@
 from __future__ import print_function
 from src.dmlexceptions import DMLError
 import src.constants as constants
+import src.events as events
 
 def meta(broadcaster):
     key = ""
@@ -16,10 +17,10 @@ def meta(broadcaster):
                 if bool(key) != bool(values):
                     raise DMLConfigSyntaxError("no key or value(s) defined")
                 
-                switch = {"output": constants.OUTPUT,
-                          "table_of_contents": constants.TOC}
+                switch = {"output": (events.FUNCTION_DATA, constants.OUTPUT),
+                          "table_of_contents": (events.FUNCTION_DATA, constants.TOC)}
                 for value in values:
-                    broadcaster.send((switch[key], value))
+                    broadcaster.send((switch[key][0], switch[key][1], value))
                 pointer = KEY
                 key = ""
                 values = []
@@ -41,7 +42,7 @@ def meta(broadcaster):
             return
         print(key, ":", values)
 
-class DMLConfigSyntaxError(DMLError):
+class DMLMetaSyntaxError(DMLError):
     """Exception raised if a syntax error in the config function in the dml file occurs
 
     Attributes:

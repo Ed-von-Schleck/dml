@@ -8,7 +8,8 @@ from tokenizer import Tokenizer
 from function import dispatch
 from dmlexceptions import DMLError
 from broadcast import broadcast
-import constants 
+import constants
+import events
 
 class NullDevice():
     def write(self, s):
@@ -41,17 +42,58 @@ def main(dml_file, options):
                 elif token == "=":
                     token = tokenizer.next()
                     if token != "=":
-                        token = tokenizer.next()
-                        if token != "=":
-                            broadcaster.send((constants.TITLE, token))
+                        print("processing title ...")
+                        broadcaster.send((events.TITLE_START, None, None))
+                        while True:
+                            broadcaster.send((events.TITLE_DATA, constants.TITLE, token))
+                            token = tokenizer.next()
+                            if token == "=":
+                                broadcaster.send((events.TITLE_END, None, None))
+                                break
                     else:
                         token = tokenizer.next()
                         if token != "=":
-                            broadcaster.send((constants.CAST, token))
+                            print("processing cast ...")
+                            broadcaster.send((events.CAST_START, None, None))
+                            while True:
+                                broadcaster.send((events.CAST_DATA, constants.CAST, token))
+                                token = tokenizer.next()
+                                if token == "=":
+                                    token = tokenizer.next()
+                                    if token == "=":
+                                        broadcaster.send((events.CAST_END, None, None))
+                                        break
+                                    else:
+                                        raise DMLSyntaxError(token, "=")
                         else:
+                            token = tokenizer.next()
                             if token != "=":
-                                broadcaster.send((constants.ACT, token))
-                    
+                                print("processing act ...")
+                                broadcaster.send((events.ACT_START, None, None))
+                                while True:
+                                    broadcaster.send((events.ACT_DATA, constants.ACT, token))
+                                    token = tokenizer.next()
+                                    if token == "=":
+                                        token = tokenizer.next()
+                                        if token == "=":
+                                            token = tokenizer.next()
+                                            if token == "=":
+                                                broadcaster.send((events.ACT_END, None, None))
+                                                break
+                                            else:
+                                                raise DMLSyntaxError(token, "=")
+                                        else:
+                                            raise DMLSyntaxError(token, "==")
+                elif token == "\n":
+                    try:
+                        token = tokenizer.next()
+                    except StopIteration:
+                        broadcaster.send((events.END, None, None))
+                        break
+                    broadcaster.send((events.BODY, constants.BODY, token))
+                else:
+                    broadcaster.send((events.BODY, constants.BODY, token))
+            broadcaster.send((events.END, None, None))
         print("closed", dml_file)
     except DMLError as dml_error:
         import linecache, sys
@@ -60,7 +102,7 @@ def main(dml_file, options):
         sys.exit(1)
     
     # overwrite document settings
-    if options.pdf:
-        broadcaster.send((constants.OUTPUT, "pdf"))
-    if options.html:
-        broadcaster.send((constants.OUTPUT, "html"))
+    #if options.pdf:
+    #    broadcaster.send((events.FUNCTION, constants.OUTPUT, "pdf"))
+    #if options.html:
+    #    broadcaster.send((events.FUNCTION, constants.OUTPUT, "html"))
