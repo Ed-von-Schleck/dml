@@ -12,28 +12,28 @@ def state_tracker():
     # this is ugly, but the information has to go somewhere
     transitions = dict((
         ((START, events.FUNCTION_START), FUNCTION_HEAD),
-        ((START, events.TITLE_START), TITLE),
-        ((START, events.CAST_START), CAST),
-        ((START, events.ACT_START), ACT),
+        ((START, events.TITLE_DEL), TITLE),
+        ((START, events.CAST_DEL), CAST),
+        ((START, events.ACT_DEL), ACT),
         ((START, events.DATA), HEAD),
         
         ((HEAD, events.DATA), HEAD),
         ((HEAD, events.NEW_PARAGRAPH), HEAD),
-        ((HEAD, events.TITLE_START), TITLE),
-        ((HEAD, events.CAST_START), CAST),
-        ((HEAD, events.ACT_START), ACT),
+        ((HEAD, events.TITLE_DEL), TITLE),
+        ((HEAD, events.CAST_DEL), CAST),
+        ((HEAD, events.ACT_DEL), ACT),
         ((HEAD, events.FUNCTION_START), FUNCTION_HEAD),
         
         ((FUNCTION_HEAD, events.FUNCTION_DATA), FUNCTION_HEAD),
         ((FUNCTION_HEAD, events.FUNCTION_END), HEAD),
         
         ((TITLE, events.DATA), TITLE),
-        ((TITLE, events.TITLE_END), TITLE_BODY),
+        ((TITLE, events.TITLE_DEL), TITLE_BODY),
         
         ((TITLE_BODY, events.NEW_PARAGRAPH), TITLE_BODY),
         ((TITLE_BODY, events.DATA), TITLE_BODY),
-        ((TITLE_BODY, events.CAST_START), CAST),
-        ((TITLE_BODY, events.ACT_START), ACT),
+        ((TITLE_BODY, events.CAST_DEL), CAST),
+        ((TITLE_BODY, events.ACT_DEL), ACT),
         ((TITLE_BODY, events.BLOCK_START), TITLE_BLOCK),
         ((TITLE_BODY, events.KEY_START), TITLE_TAG),
         
@@ -52,14 +52,14 @@ def state_tracker():
         ((FUNCTION_TITLE, events.FUNCTION_END), TITLE_BODY),
         
         ((CAST, events.DATA), CAST),
-        ((CAST, events.CAST_END), CAST_BODY),
+        ((CAST, events.CAST_DEL), CAST_BODY),
         ((CAST, events.FUNCTION_START), FUNCTION_CAST),
         
         ((FUNCTION_CAST, events.FUNCTION_DATA), FUNCTION_CAST),
         ((FUNCTION_CAST, events.FUNCTION_END), CAST),
         
         ((CAST_BODY, events.DATA), CAST_BODY),
-        ((CAST_BODY, events.ACT_START), ACT),
+        ((CAST_BODY, events.ACT_DEL), ACT),
         ((CAST_BODY, events.NEW_PARAGRAPH), CAST_BODY),
         ((CAST_BODY, events.BLOCK_START), CAST_BLOCK),
         ((CAST_BODY, events.KEY_START), ACTOR_DEC),
@@ -75,13 +75,13 @@ def state_tracker():
         ((ACTOR_DES, events.NEW_PARAGRAPH), CAST_BODY),
         
         ((ACT, events.DATA), ACT),
-        ((ACT, events.ACT_END), BODY),
+        ((ACT, events.ACT_DEL), BODY),
         
         ((BODY, events.FUNCTION_START), FUNCTION_BODY),
-        ((BODY, events.ACT_START), ACT),
-        ((BODY, events.DATA), BODY),    # may be removed later, dunno
+        ((BODY, events.ACT_DEL), ACT),
+        #((BODY, events.DATA), BODY),    # may be removed later, dunno
         ((BODY, events.NEW_PARAGRAPH), BODY),
-        ((BODY, events.TITLE_START), TITLE),
+        #((BODY, events.TITLE_START), TITLE),
         ((BODY, events.BLOCK_START), BLOCK),
         ((BODY, events.KEY_START), ACTOR),
         ((BODY, events.END), END),

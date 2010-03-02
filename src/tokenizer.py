@@ -2,6 +2,9 @@ from __future__ import print_function
 
 import shlex
 
+from parsermanager import parser_manager
+import events
+
 class Tokenizer(object):
     def __init__(self, dml):
         self._lex_file = shlex.shlex(dml)
@@ -22,13 +25,23 @@ class Tokenizer(object):
     @property
     def line_number(self):
         return self._lex_file.lineno
-    
-    def recognize_whitespace(self):
-        self._lex_file.whitespace = self._lex_file.whitespace.replace(" ", "")
-
-    def ignore_whitespace(self):
-        if not " " in self._lex_file.whitespace:
-            self._lex_file.whitespace += " "
+        
+    def set_whitespace(self, value):
+        if value:
+            self._lex_file.whitespace = self._lex_file.whitespace.replace(" ", "")
+        else:
+            if not " " in self._lex_file.whitespace:
+                self._lex_file.whitespace += " "
             
     def push(self, token):
         self._lex_file.push_token(token)
+        
+    def run(self, broadcaster, parser_entry):
+        with parser_manager(parser_entry, broadcaster, self.push, self.set_whitespace) as entry:
+            while True:
+                token = self._lex_file.get_token()
+                if token is self._eof:
+                    break
+                entry.send(token)
+            broadcaster.send((events.END, None, None))
+        

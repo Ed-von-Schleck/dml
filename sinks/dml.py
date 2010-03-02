@@ -23,7 +23,6 @@ filters = (stop_if_not_requested,)
 def sink(path, filename):
     print("starting sink '{0}' ...".format(SHORTNAME))
     filename = os.path.join(path, filename + "." + SHORTNAME)
-    last_token_key = None
     try:
         with open(filename, "w") as file:
             print("starting writing file '{0}' ...".format(filename))
@@ -34,8 +33,7 @@ def sink(path, filename):
                     if key == constants.TOKEN:
                         file.write("".join((value, " ")))
                     elif key == constants.FORCE_NEWLINE:
-                        file.write("\n")
-                        
+                        file.write("\\\\\n")
                 
                 elif event == events.FUNCTION_START:
                     file.write("".join(("@", value, " {\n")))
@@ -44,21 +42,23 @@ def sink(path, filename):
                 elif event == events.FUNCTION_DATA:
                     file.write("".join((constants.names[key], ": ", value, "\n")))
                     
-                elif event == events.TITLE_START:
-                    file.write("\n= ")
-                elif event == events.TITLE_END:
-                    file.write("=")
+                elif event == events.TITLE_DEL:
+                    if state == states.TITLE:
+                        file.write("\n= ")
+                    else:
+                        file.write("=")
                     
-                elif event == events.CAST_START:
-                    file.write("\n== ")
-                elif event == events.CAST_END:
-                    file.write("==")
+                elif event == events.CAST_DEL:
+                    if state == states.CAST:
+                        file.write("\n== ")
+                    else:
+                        file.write("==")
                     
-                elif event == events.ACT_START:
-                    file.write("\n=== ")
-
-                elif event == events.ACT_END:
-                    file.write("===")
+                elif event == events.ACT_DEL:
+                    if state == states.ACT:
+                        file.write("\n=== ")
+                    else:
+                        file.write("===")
 
                 elif event == events.NEW_PARAGRAPH:
                     file.write("\n")
@@ -75,8 +75,6 @@ def sink(path, filename):
                     file.write("\n\t")
                 elif event == events.KEY_END:
                     file.write(": ")
-                    
-                last_token_key = key
     except GeneratorExit:
         print("stopped sink '{0}'".format(SHORTNAME))
                     
