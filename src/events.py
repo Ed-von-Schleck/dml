@@ -1,2 +1,2 @@
-START, FUNCTION_START, FUNCTION_DATA, FUNCTION_END, TITLE_DEL, CAST_DEL,  ACT_DEL, DATA, KEY_START, KEY_END, INLINE_DIR_START, INLINE_DIR_END, NEW_PARAGRAPH, BLOCK_START, BLOCK_END, END = range(16)
-names = "Start", "Function Start", "Function Data", "Function End", "Title Delimiter", "Cast Delimiter", "Act Delimiter", "Data", "Key Start", "Key End", "Stage Dir. Start", "Stage Dir. End", "New Paragraph", "Block Start", "Block End", "End"
+START, CMD_LINE_OPTION, FUNCTION_START, FUNCTION_DATA, FUNCTION_END, TITLE_DEL, CAST_DEL,  ACT_DEL, DATA, KEY_START, KEY_END, INLINE_DIR_START, INLINE_DIR_END, NEW_PARAGRAPH, BLOCK_START, BLOCK_END, END = range(17)
+names = "Start", "Cmd. Line Option", "Function Start", "Function Data", "Function End", "Title Delimiter", "Cast Delimiter", "Act Delimiter", "Data", "Key Start", "Key End", "Stage Dir. Start", "Stage Dir. End", "New Paragraph", "Block Start", "Block End", "End"

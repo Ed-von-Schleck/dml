@@ -1,8 +1,5 @@
 """
-a dml sink
-
-Yes, this doesn't make much sense for an end user, but it's great for testing
-and debugging. 
+a debug sink
 """
 
 from __future__ import print_function

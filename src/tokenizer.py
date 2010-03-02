@@ -32,12 +32,9 @@ class Tokenizer(object):
         else:
             if not " " in self._lex_file.whitespace:
                 self._lex_file.whitespace += " "
-            
-    def push(self, token):
-        self._lex_file.push_token(token)
-        
+
     def run(self, broadcaster, parser_entry):
-        with parser_manager(parser_entry, broadcaster, self.push, self.set_whitespace) as entry:
+        with parser_manager(parser_entry, broadcaster, self._lex_file.push_token, self.set_whitespace) as entry:
             while True:
                 token = self._lex_file.get_token()
                 if token is self._eof:

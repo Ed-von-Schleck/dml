@@ -7,6 +7,8 @@ from tokenizer import Tokenizer
 from dmlexceptions import DMLError
 from broadcast import broadcast
 from parserentry import parser_entry
+import constants
+import events
 
 class NullDevice():
     def write(self, s):
@@ -20,7 +22,11 @@ def main(dml_file, options=None):
     filename, ext = os.path.splitext(os.path.basename(dml_file))
     broadcaster = broadcast(os.getcwd(), filename)
     broadcaster.next()
-    
+    if options.pdf:
+        broadcaster.send((events.CMD_LINE_OPTION, constants.OUTPUT, "pdf"))
+    if options.html:
+        broadcaster.send((events.CMD_LINE_OPTION, constants.OUTPUT, "html"))
+
     try:
         with open(dml_file) as dml:
             print("opening", dml_file, "...")
@@ -34,7 +40,3 @@ def main(dml_file, options=None):
         sys.exit(1)
     
     # overwrite document settings
-    #if options.pdf:
-    #    broadcaster.send((events.FUNCTION, constants.OUTPUT, "pdf"))
-    #if options.html:
-    #    broadcaster.send((events.FUNCTION, constants.OUTPUT, "html"))

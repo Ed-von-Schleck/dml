@@ -11,6 +11,7 @@ def state_tracker():
     state = START
     # this is ugly, but the information has to go somewhere
     transitions = dict((
+        ((START, events.CMD_LINE_OPTION), START),
         ((START, events.FUNCTION_START), FUNCTION_HEAD),
         ((START, events.TITLE_DEL), TITLE),
         ((START, events.CAST_DEL), CAST),
