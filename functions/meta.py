@@ -17,7 +17,7 @@ def meta(broadcaster, push):
                 if not key and not values:
                     continue
                 if bool(key) != bool(values):
-                    raise DMLConfigSyntaxError("no key or value(s) defined")
+                    raise DMLMetaSyntaxError("no key or value(s) defined")
                 for value in values:
                     broadcaster.send((switch[key][0], switch[key][1], value))
                 pointer = KEY
@@ -26,24 +26,28 @@ def meta(broadcaster, push):
 
             elif token == "=" or token == ":":
                 if key == "":
-                    raise DMLConfigSyntaxError("no key defined")
+                    raise DMLMetaSyntaxError("no key defined")
                 pointer = VALUES
                 
             else:
                 if pointer == KEY:
                     if key != "":
-                        raise DMLConfigSyntaxError("a key is already defined")
+                        raise DMLMetaSyntaxError("a key is already defined")
                     key = token.lower()
                 else:
                     values.append(token.lower())
     except GeneratorExit:
         if not key and not values:
             return
-        print(key, ":", values)
+        if bool(key) != bool(values):
+            raise DMLMetaSyntaxError("no key or value(s) defined")
+        for value in values:
+            broadcaster.send((switch[key][0], switch[key][1], value))
+
 
 class DMLMetaSyntaxError(DMLError):
     """Exception raised if a syntax error in the config function in the dml file occurs
 
     Attributes:
-        name -- undefined function
+        msg -- message
     """

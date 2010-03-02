@@ -9,6 +9,7 @@ SHORTNAME = "stop_if_not_requested"
 
 def filter(target, target_shortname):
     listening_for_output_request = True
+    send = target.send
     print("starting filter '{0}' for {1} ... ".format(NAME, target_shortname))
     try:
         while True:
@@ -25,6 +26,6 @@ def filter(target, target_shortname):
                     print("filter '{0}' stopping '{1}' ... ".format(NAME, target_shortname))
                     target.close()
                     break
-            target.send((state, event, key, value))
+            send((state, event, key, value))
     except GeneratorExit:
         print("stopped filter '{0}' for '{1}'".format(NAME, target_shortname))

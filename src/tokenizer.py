@@ -11,6 +11,7 @@ class Tokenizer(object):
         self._lex_file.whitespace_split = False
         self._lex_file.whitespace = " \r"
         self._lex_file.wordchars += "!,.;"
+        self._lex_file.commenters = ""
         self._eof = self._lex_file.eof
 
     def __iter__(self):
@@ -35,10 +36,22 @@ class Tokenizer(object):
 
     def run(self, broadcaster, parser_entry):
         with parser_manager(parser_entry, broadcaster, self._lex_file.push_token, self.set_whitespace) as entry:
+            get_token = self._lex_file.get_token
+            eof = self._eof
+            send = entry.send
             while True:
-                token = self._lex_file.get_token()
-                if token is self._eof:
+                token = get_token()
+                if token == "#":
+                    # my own commenting logic, because shlex doesn't give me
+                    # line endings
+                    while True:
+                        token = get_token()
+                        if token == "\n":
+                            break
+                        elif token is eof:
+                            break
+                elif token is eof:
                     break
-                entry.send(token)
+                send(token)
             broadcaster.send((events.END, None, None))
         

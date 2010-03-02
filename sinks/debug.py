@@ -27,6 +27,7 @@ def sink(path, filename):
             count = 0
             header = "{0: ^18} | {1: ^18} | {2: ^18} | {3: ^18}\n".format("state", "event", "key", "token")
             line = "-" * 79 + "\n"
+            write = file.write
             while True:
                 state, event, key, value = (yield)
                 state_name = states.names[state]
@@ -35,12 +36,12 @@ def sink(path, filename):
                 value_name = "-" if value == None else value
                 out = "{0:18} | {1:18} | {2:18} | {3:18}\n".format(state_name, event_name, key_name, value_name)
                 if count == 0:
-                    file.write("\n")
-                    file.write(header)
-                    file.write(line)
+                    write("\n")
+                    write(header)
+                    write(line)
                 count += 1
                 count %= 40
-                file.write(out)
+                write(out)
         print("stopped writing file '{0}'".format(filename))
 
     except GeneratorExit:

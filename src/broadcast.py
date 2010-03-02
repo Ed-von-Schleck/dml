@@ -36,10 +36,11 @@ def broadcast(path, filename):
         mysinks.append(MySink(mod, cor, filters))
 
     state_machine = states.state_tracker()
+    sms = state_machine.send
     state = state_machine.next()
     while True:
         event, key, value = (yield)
-        state = state_machine.send(event)
+        state = sms(event)
         #print(".", end="")
         closed_sinks = []
         for sink in mysinks:
