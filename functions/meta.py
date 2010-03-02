@@ -3,11 +3,13 @@ from src.dmlexceptions import DMLError
 import src.constants as constants
 import src.events as events
 
-def meta(broadcaster):
+def meta(broadcaster, push):
     key = ""
     values = []
     KEY, VALUES = 0, 1
     pointer = KEY
+    switch = {"output": (events.FUNCTION_DATA, constants.OUTPUT),
+              "table_of_contents": (events.FUNCTION_DATA, constants.TOC)}
     try:
         while True:
             token = (yield)
@@ -16,9 +18,6 @@ def meta(broadcaster):
                     continue
                 if bool(key) != bool(values):
                     raise DMLConfigSyntaxError("no key or value(s) defined")
-                
-                switch = {"output": (events.FUNCTION_DATA, constants.OUTPUT),
-                          "table_of_contents": (events.FUNCTION_DATA, constants.TOC)}
                 for value in values:
                     broadcaster.send((switch[key][0], switch[key][1], value))
                 pointer = KEY

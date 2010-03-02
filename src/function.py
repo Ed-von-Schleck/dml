@@ -12,14 +12,15 @@ def function(func):
         return cr
     return start
 
-def dispatch(broadcaster, func_name):
+def dispatch(broadcaster, push):
+    func_name = (yield)
     try:
         if func_name not in functions.functions:
             raise DMLFunctionNameError(func_name)
         open_brackets = (yield)
         if open_brackets != "{":
             raise DMLSyntaxError(open_brackets, "{")
-        func = functions.functions[func_name](broadcaster)
+        func = functions.functions[func_name](broadcaster, push)
         func.next()
         broadcaster.send((events.FUNCTION_START, constants.FUNCTION_NAME, func_name))
         while True:

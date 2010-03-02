@@ -1,51 +1,52 @@
 @meta {
-output = dml
+output = dml debug
 table_of_contents: true
 }
 
 = The Short, But Complete Play =
+
 or Whatever A Subtitle Might Add In Subtlety
 
-author: Ed von Schleck
-date: February 26th, 2010
+    author: Ed von Schleck
+    date: February 26th, 2010
 
 == Cast ==
 
-Ed: a charmful hero
-Lara: a princess
-Bill, Bill the dragon: the dragon
-the Spanish Inquisition
+    Ed: a charmful hero
+    Lara: a princess
+    Bill: the dragon
+    the Spanish Inquisition
 
 === ACT I ===
 
 It was a dark and stormy night. Ed sat on his computer and hacked a parser
 for a markup language he had yet to invent. Suddenly he heard a pained scream.
 
-Ed: <walks to his window> What was that?
+    Ed: <walks to his window> What was that?
 # This is so stupid
-Lara: <being dragged away by a dragon> Help me! <off>
-Ed: For great Justice!
+    Lara: <being dragged away by a dragon> Help me! <off>
+    Ed: For great Justice!
 
 === ACT II ===
 
 In the dragons lair.
 
-Bill the dragon: I will eat you, because that is what I do!
-Lara: Oh please don't. # now this isn't the sharpest dialog ever, but it'll do
-Bill: Sorry, it's my nature.
+    Bill the dragon: I will eat you, because that is what I do!
+    Lara: Oh please don't. # now this isn't the sharpest dialog ever, but it'll do
+    Bill: Sorry, it's my nature.
 
 Bill is setting the table.
 
-Bill: <sings> Being a dragon is great fun\\
+    Bill: <recites and old dragon poem> Being a dragon is great fun\\
 I eat my princesses well done.
 
-Ed: <enters the lair> Hand over that lovely lady, and/or die!
-Bill: Why?
-Ed: <shrugs> I don't know. Am I not supposed say so?
-Bill: Who said that?
-Ed: Look, can we get this over with? I didn't expect a kind of Spanish
+    Ed: <enters the lair> Hand over that lovely lady, and/or die!
+    Bill: Why?
+    Ed: <shrugs> I don't know. Am I not supposed say so?
+    Bill: Who said that?
+    Ed: Look, can we get this over with? I didn't expect a kind of Spanish
 Inquisition!
-the Spanish Inquisition: <storms in> Nobody expects the Spanish
+    the Spanish Inquisition: <storms in> Nobody expects the Spanish
 Inquisition!
 
 pause
@@ -54,8 +55,8 @@ pause
 
 Bill, the dragon lies on the floor, dead.
 
-Lara: Thank you for rescuing me! It's OK that you took the narrativ shortcut
+    Lara: Thank you for rescuing me! It's OK that you took the narrativ shortcut
 to fight Bill while everyone was outside downing a few beers.
-Ed: Yeah, let's go home, I've got a parser to write.
+    Ed: Yeah, let's go home, I've got a parser to write.
 
 drop.

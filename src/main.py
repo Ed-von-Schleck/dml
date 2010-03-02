@@ -2,94 +2,97 @@ from __future__ import print_function
 
 import sys
 import os, os.path
-from collections import deque
 
 from tokenizer import Tokenizer
 from function import dispatch
+from titlecastact import title_cast_or_act
+from key import key
 from dmlexceptions import DMLError
 from broadcast import broadcast
 import constants
 import events
+from parsermanager import parser_manager
 
 class NullDevice():
     def write(self, s):
         pass
 
-def main(dml_file, options):
-    if not options.verbose:
+def main(dml_file, options=None):
+    if options is not None and not options.verbose:
         sys.stdout = NullDevice()
     
     filename, ext = os.path.splitext(os.path.basename(dml_file))
-    path = os.getcwd()
-    broadcaster = broadcast(path, filename)
+    broadcaster = broadcast(os.getcwd(), filename)
     broadcaster.next()
     
     try:
         with open(dml_file) as dml:
             print("opening", dml_file, "...")
             tokenizer = Tokenizer(dml)
-            buffer = deque()
+            push = tokenizer.push
             for token in tokenizer:
-                # check for functions
-                if token == "@":
-                    function_dispatch = dispatch(broadcaster, tokenizer.next())
-                    function_dispatch.next()
-                    try:
-                        while True:
-                            function_dispatch.send(tokenizer.next())
-                    except StopIteration:
-                        pass
-                    finally:
-                        function_dispatch.close()
-                elif token == "=":
-                    token = tokenizer.next()
-                    if token != "=":
-                        print("processing title ...")
-                        broadcaster.send((events.TITLE_START, None, None))
-                        while True:
-                            broadcaster.send((events.TITLE_DATA, constants.TITLE, token))
-                            token = tokenizer.next()
-                            if token == "=":
-                                broadcaster.send((events.TITLE_END, None, None))
-                                break
-                    else:
-                        token = tokenizer.next()
-                        if token != "=":
-                            print("processing cast ...")
-                            broadcaster.send((events.CAST_START, None, None))
+                try:
+                    # check for functions
+                    if token == "@":
+                        with parser_manager(dispatch, broadcaster, push) as function_dispatch:
                             while True:
-                                broadcaster.send((events.CAST_DATA, constants.CAST, token))
-                                token = tokenizer.next()
-                                if token == "=":
-                                    token = tokenizer.next()
-                                    if token == "=":
-                                        broadcaster.send((events.CAST_END, None, None))
-                                        break
-                                    else:
-                                        raise DMLSyntaxError(token, "=")
-                        else:
+                                function_dispatch.send(tokenizer.next())
+                    elif token == "\n":
+                        tokenizer.recognize_whitespace()
+                        token = tokenizer.next()
+                        tokenizer.ignore_whitespace()
+                        if token == "\n":
+                            broadcaster.send((events.NEW_PARAGRAPH, None, None))
+                            tokenizer.recognize_whitespace()
                             token = tokenizer.next()
-                            if token != "=":
-                                print("processing act ...")
-                                broadcaster.send((events.ACT_START, None, None))
+                            tokenizer.ignore_whitespace()
+                            if token == " " or token == "\t":   # key (actor or tag or sth.)
+                                with parser_manager(key, broadcaster, push) as key_parser:
+                                    while True:
+                                        key_parser.send(tokenizer.next())
+
+                            elif token == "=":  # this is a title, cast or act
+                                with parser_manager(title_cast_or_act, broadcaster, push) as tca:
+                                    while True:
+                                        tca.send(tokenizer.next())
+                            elif token == "\n":
+                                pass # ignore 3 linebreaks. Have to check if that makes sense, though
+                            else:
+                                broadcaster.send((events.BLOCK_START, None, None))
+                                broadcaster.send((events.DATA, constants.TOKEN, token))
+
+                        elif token == " " or token == "\t":
+                            broadcaster.send((events.DATA, constants.TOKEN, "test"))
+                            with parser_manager(key, broadcaster, push) as key_parser:
                                 while True:
-                                    broadcaster.send((events.ACT_DATA, constants.ACT, token))
-                                    token = tokenizer.next()
-                                    if token == "=":
-                                        token = tokenizer.next()
-                                        if token == "=":
-                                            token = tokenizer.next()
-                                            if token == "=":
-                                                broadcaster.send((events.ACT_END, None, None))
-                                                break
-                                            else:
-                                                raise DMLSyntaxError(token, "=")
-                                        else:
-                                            raise DMLSyntaxError(token, "==")
-                elif token == "\n":
-                    broadcaster.send((events.BODY, constants.NEWLINE, token))
-                else:
-                    broadcaster.send((events.BODY, constants.TOKEN, token))
+                                    key_parser.send(tokenizer.next())
+                        else:
+                            broadcaster.send((events.DATA, constants.TOKEN, token))
+                            
+                            
+                    elif token == "\\":
+                        token = tokenizer.next()
+                        if token == "\\":
+                            broadcaster.send((events.DATA, constants.FORCE_NEWLINE, token))
+                        else:
+                            broadcaster.send((events.DATA, constants.TOKEN, "\\"))
+                            broadcaster.send((events.DATA, constants.TOKEN, token))
+                            
+                    elif token == "<":
+                        broadcaster.send((events.INLINE_DIR_START, None, None))
+                        
+                    elif token == ">":
+                        broadcaster.send((events.INLINE_DIR_END, None, None))
+                        
+                    else:
+                        if token != " ":   
+                            # for some reason, sometimes whitespaces appears here
+                            # I suspect some kind of prefetching in the generator
+                            # or a programming bug, who knows ...
+                            broadcaster.send((events.DATA, constants.TOKEN, token))
+                        
+                except StopIteration: # because it may be raised with any tokenizer.next()
+                    pass
             broadcaster.send((events.END, None, None))
         print("closed", dml_file)
     except DMLError as dml_error:

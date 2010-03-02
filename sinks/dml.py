@@ -23,41 +23,60 @@ filters = (stop_if_not_requested,)
 def sink(path, filename):
     print("starting sink '{0}' ...".format(SHORTNAME))
     filename = os.path.join(path, filename + "." + SHORTNAME)
+    last_token_key = None
     try:
         with open(filename, "w") as file:
             print("starting writing file '{0}' ...".format(filename))
             while True:
                 state, event, key, value = (yield)
-                if event == events.FUNCTION_START:
+                
+                if event == events.DATA:
+                    if key == constants.TOKEN:
+                        file.write("".join((value, " ")))
+                    elif key == constants.FORCE_NEWLINE:
+                        file.write("\n")
+                        
+                
+                elif event == events.FUNCTION_START:
                     file.write("".join(("@", value, " {\n")))
                 elif event == events.FUNCTION_END:
-                    file.write("}\n")
+                    file.write("}")
                 elif event == events.FUNCTION_DATA:
                     file.write("".join((constants.names[key], ": ", value, "\n")))
                     
                 elif event == events.TITLE_START:
-                    file.write("= ")
-                elif event == events.TITLE_DATA:
-                    file.write("".join((value, " ")))
+                    file.write("\n= ")
                 elif event == events.TITLE_END:
-                    file.write("=\n")
+                    file.write("=")
                     
                 elif event == events.CAST_START:
-                    file.write("== ")
-                elif event == events.CAST_DATA:
-                    file.write("".join((value, " ")))
+                    file.write("\n== ")
                 elif event == events.CAST_END:
-                    file.write("==\n")
+                    file.write("==")
                     
                 elif event == events.ACT_START:
-                    file.write("=== ")
-                elif event == events.ACT_DATA:
-                    file.write("".join((value, " ")))
-                elif event == events.ACT_END:
-                    file.write("===\n")
+                    file.write("\n=== ")
 
-                elif event == events.BODY:
-                    file.write("".join((value, " ")))
+                elif event == events.ACT_END:
+                    file.write("===")
+
+                elif event == events.NEW_PARAGRAPH:
+                    file.write("\n")
+                    
+                elif event == events.BLOCK_START:
+                    file.write("\n")
+
+                elif event == events.INLINE_DIR_START:
+                    file.write("< ")
+                elif event == events.INLINE_DIR_END:
+                    file.write("> ")
+                    
+                elif event == events.KEY_START:
+                    file.write("\n\t")
+                elif event == events.KEY_END:
+                    file.write(": ")
+                    
+                last_token_key = key
     except GeneratorExit:
         print("stopped sink '{0}'".format(SHORTNAME))
                     
