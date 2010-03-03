@@ -6,7 +6,7 @@ import os, os.path
 from src.tokenizer import Tokenizer
 from src.dmlexceptions import DMLError
 from src.broadcast import broadcast
-from src.parserentry import parser_entry
+from src.parser import parser_entry
 import src.constants as constants
 import src.events as events
 

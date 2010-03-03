@@ -2,7 +2,7 @@ from __future__ import print_function
 
 import shlex
 
-from src.parsermanager import parser_manager
+from src.parser import parser_manager
 import src.events as events
 
 class Tokenizer(object):
