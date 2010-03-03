@@ -1,6 +1,5 @@
-from dmlexceptions import DMLSyntaxError
-import constants
-import events
+import src.constants as constants
+import src.events as events
 
 def key(broadcaster, push):
     broadcaster.send((events.KEY_START, None, None))

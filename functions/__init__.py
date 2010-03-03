@@ -1,6 +1,3 @@
-__all__ = ["meta"]
+__all__ = ["meta", "include"]
 
-import meta
-
-__function_parsers = [meta.meta]
-functions = dict(zip(__all__, __function_parsers))
+import meta, include

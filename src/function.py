@@ -4,30 +4,23 @@ import functions
 from dmlexceptions import DMLSyntaxError, DMLFunctionNameError
 import constants
 import events
+from parsermanager import parser_manager
 
-def function(func):
-    def start(*args,**kwargs):
-        cr = func(*args,**kwargs)
-        cr.next()
-        return cr
-    return start
-
-def dispatch(broadcaster, push):
+def dispatch(broadcaster, metadata, push, source):
     func_name = (yield)
+    #print(func_name)
     try:
-        if func_name not in functions.functions:
+        if func_name not in functions.__all__:
             raise DMLFunctionNameError(func_name)
         open_brackets = (yield)
         if open_brackets != "{":
             raise DMLSyntaxError(open_brackets, "{")
-        func = functions.functions[func_name](broadcaster, push)
-        func.next()
-        broadcaster.send((events.FUNCTION_START, constants.FUNCTION_NAME, func_name))
-        while True:
-            token = (yield)
-            if token == "}":
-                break
-            func.send(token)
-        broadcaster.send((events.FUNCTION_END, constants.FUNCTION_NAME, func_name))
+        with parser_manager(functions.__dict__[func_name].function, broadcaster, metadata, push, source) as func:
+            while True:
+                token = (yield)
+                if token == "}":
+                    func.close()
+                    break
+                func.send(token)
     except GeneratorExit:
         pass

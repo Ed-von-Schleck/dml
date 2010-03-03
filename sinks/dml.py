@@ -2,7 +2,8 @@
 a dml sink
 
 Yes, this doesn't make much sense for an end user, but it's great for testing
-and debugging. 
+and debugging. No Functions though (wouldn't make much sense if you think about
+it.
 """
 
 from __future__ import print_function
@@ -20,9 +21,9 @@ VERYSHORTNAME = "d"
 DESCRIPTION = "generates DML output"
 filters = (stop_if_not_requested,)
 
-def sink(path, filename):
+def sink(metadata):
     print("starting sink '{0}' ...".format(SHORTNAME))
-    filename = os.path.join(path, filename + "." + SHORTNAME)
+    filename = os.path.join(metadata["working_dir"], metadata["name"] + "." + SHORTNAME)
     try:
         with open(filename, "w") as file:
             write = file.write
@@ -35,13 +36,6 @@ def sink(path, filename):
                         write("".join((value, " ")))
                     elif key == constants.FORCE_NEWLINE:
                         write("\\\\\n")
-                
-                elif event == events.FUNCTION_START:
-                    write("".join(("@", value, " {\n")))
-                elif event == events.FUNCTION_END:
-                    write("}")
-                elif event == events.FUNCTION_DATA:
-                    write("".join((constants.names[key], ": ", value, "\n")))
                     
                 elif event == events.TITLE_DEL:
                     if state == states.TITLE:

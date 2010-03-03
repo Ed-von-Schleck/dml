@@ -2,56 +2,55 @@ from __future__ import print_function
 
 import shlex
 
-from parsermanager import parser_manager
-import events
+from src.parsermanager import parser_manager
+import src.events as events
 
 class Tokenizer(object):
     def __init__(self, dml):
         self._lex_file = shlex.shlex(dml)
         self._lex_file.whitespace_split = False
-        self._lex_file.whitespace = " \r"
-        self._lex_file.wordchars += "!,.;"
+        self._lex_file.whitespace = " \r\t"
+        self._lex_file.wordchars += "!,.;-"
         self._lex_file.commenters = ""
-        self._eof = self._lex_file.eof
-
-    def __iter__(self):
-        return self
+        self._get_next_whitespace = False
+        self._ignore_next_newline = False
         
-    def next(self):
-        token = self._lex_file.get_token()
-        if token is self._eof:
-            raise StopIteration
-        return token
-
     @property
     def line_number(self):
         return self._lex_file.lineno
+                
+    def get_next_whitespace(self):
+        self._get_next_whitespace = True
+        self._lex_file.whitespace = self._lex_file.whitespace.replace(" ", "")
+        self._lex_file.whitespace = self._lex_file.whitespace.replace("\t", "")
         
-    def set_whitespace(self, value):
-        if value:
-            self._lex_file.whitespace = self._lex_file.whitespace.replace(" ", "")
-        else:
-            if not " " in self._lex_file.whitespace:
-                self._lex_file.whitespace += " "
+    def ignore_next_newline(self):
+        self._ignore_next_newline = True
+        self._lex_file.whitespace += "\n"
 
-    def run(self, broadcaster, parser_entry):
-        with parser_manager(parser_entry, broadcaster, self._lex_file.push_token, self.set_whitespace) as entry:
-            get_token = self._lex_file.get_token
-            eof = self._eof
+    def run(self, broadcaster, parser_entry, metadata):
+        with parser_manager(parser_entry,
+                            broadcaster,
+                            metadata,
+                            self._lex_file.push_token,
+                            self._lex_file.push_source,
+                            self.get_next_whitespace,
+                            self.ignore_next_newline) as entry:
             send = entry.send
-            while True:
-                token = get_token()
+            for token in self._lex_file:
                 if token == "#":
                     # my own commenting logic, because shlex doesn't give me
                     # line endings
-                    while True:
-                        token = get_token()
+                    for token in self._lex_file:
                         if token == "\n":
                             break
-                        elif token is eof:
-                            break
-                elif token is eof:
-                    break
+                
+                if self._get_next_whitespace:
+                    self._get_next_whitespace = False
+                    self._lex_file.whitespace += " \t"
+                if self._ignore_next_newline:
+                    self._ignore_next_newline = False
+                    self._lex_file.whitespace = self._lex_file.whitespace.replace("\n", "")
                 send(token)
             broadcaster.send((events.END, None, None))
         

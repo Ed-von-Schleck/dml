@@ -1,32 +1,30 @@
 from __future__ import print_function
 
-import constants
-import events
-from dmlexceptions import DMLError
+import src.constants as constants
+import src.events as events
+from src.dmlexceptions import DMLError
 
-START, HEAD, TITLE, TITLE_BODY, TITLE_BLOCK, CAST, CAST_BODY, CAST_BLOCK, ACT, BODY, BLOCK, FUNCTION_HEAD, FUNCTION_TITLE, FUNCTION_CAST, FUNCTION_BODY, ACTOR, DIALOG, TITLE_TAG, TITLE_VALUE, ACTOR_DEC, ACTOR_DES, INLINE_DIR, END = range(23)
-names = "Start", "Head", "Title", "Title Body", "Title Block", "Cast", "Cast Body", "Cast Block", "Act", "Body", "Block", "Head Function", "Title Function", "Cast Function", "Body Function", "Actor", "Dialog", "Title Tag", "Title Value", "Actor Declaration", "Actor Description", "Stage Dir.", "End"
+START, HEAD, TITLE, TITLE_BODY, TITLE_BLOCK, CAST, CAST_BODY, CAST_BLOCK, ACT, BODY, BLOCK, ACTOR, DIALOG, TITLE_TAG, TITLE_VALUE, ACTOR_DEC, ACTOR_DES, INLINE_DIR, END = range(19)
+names = "Start", "Head", "Title", "Title Body", "Title Block", "Cast", "Cast Body", "Cast Block", "Act", "Body", "Block", "Actor", "Dialog", "Title Tag", "Title Value", "Actor Declaration", "Actor Description", "Stage Dir.", "End"
 
 def state_tracker():
     state = START
     # this is ugly, but the information has to go somewhere
     transitions = dict((
         ((START, events.CMD_LINE_OPTION), START),
-        ((START, events.FUNCTION_START), FUNCTION_HEAD),
+        ((START, events.FUNCTION_DATA), START),
         ((START, events.TITLE_DEL), TITLE),
         ((START, events.CAST_DEL), CAST),
         ((START, events.ACT_DEL), ACT),
         ((START, events.DATA), HEAD),
+        ((START, events.NEW_PARAGRAPH), HEAD),
         
         ((HEAD, events.DATA), HEAD),
         ((HEAD, events.NEW_PARAGRAPH), HEAD),
         ((HEAD, events.TITLE_DEL), TITLE),
         ((HEAD, events.CAST_DEL), CAST),
         ((HEAD, events.ACT_DEL), ACT),
-        ((HEAD, events.FUNCTION_START), FUNCTION_HEAD),
-        
-        ((FUNCTION_HEAD, events.FUNCTION_DATA), FUNCTION_HEAD),
-        ((FUNCTION_HEAD, events.FUNCTION_END), HEAD),
+        ((HEAD, events.FUNCTION_DATA), HEAD),
         
         ((TITLE, events.DATA), TITLE),
         ((TITLE, events.TITLE_DEL), TITLE_BODY),
@@ -47,17 +45,11 @@ def state_tracker():
         
         ((TITLE_BLOCK, events.DATA), TITLE_BLOCK),
         ((TITLE_BLOCK, events.NEW_PARAGRAPH), TITLE_BODY),
-        ((TITLE_BODY, events.FUNCTION_START), FUNCTION_TITLE),
-        
-        ((FUNCTION_TITLE, events.FUNCTION_DATA), FUNCTION_TITLE),
-        ((FUNCTION_TITLE, events.FUNCTION_END), TITLE_BODY),
+        ((TITLE_BODY, events.FUNCTION_DATA), TITLE_BODY),
         
         ((CAST, events.DATA), CAST),
         ((CAST, events.CAST_DEL), CAST_BODY),
-        ((CAST, events.FUNCTION_START), FUNCTION_CAST),
-        
-        ((FUNCTION_CAST, events.FUNCTION_DATA), FUNCTION_CAST),
-        ((FUNCTION_CAST, events.FUNCTION_END), CAST),
+        ((CAST, events.FUNCTION_DATA), CAST),
         
         ((CAST_BODY, events.DATA), CAST_BODY),
         ((CAST_BODY, events.ACT_DEL), ACT),
@@ -78,11 +70,9 @@ def state_tracker():
         ((ACT, events.DATA), ACT),
         ((ACT, events.ACT_DEL), BODY),
         
-        ((BODY, events.FUNCTION_START), FUNCTION_BODY),
+        ((BODY, events.FUNCTION_DATA), BODY),
         ((BODY, events.ACT_DEL), ACT),
-        #((BODY, events.DATA), BODY),    # may be removed later, dunno
         ((BODY, events.NEW_PARAGRAPH), BODY),
-        #((BODY, events.TITLE_START), TITLE),
         ((BODY, events.BLOCK_START), BLOCK),
         ((BODY, events.KEY_START), ACTOR),
         ((BODY, events.END), END),
@@ -103,9 +93,6 @@ def state_tracker():
         
         ((INLINE_DIR, events.DATA), INLINE_DIR),
         ((INLINE_DIR, events.INLINE_DIR_END), DIALOG),
-        
-        ((FUNCTION_BODY, events.FUNCTION_DATA), FUNCTION_BODY),
-        ((FUNCTION_BODY, events.FUNCTION_END), BODY),
 
         ((END, events.END), END))
     )

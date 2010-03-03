@@ -8,24 +8,22 @@ NAME = "stop if not requested in HEAD"
 SHORTNAME = "stop_if_not_requested"
 
 def filter(target, target_shortname):
-    listening_for_output_request = True
     send = target.send
     print("starting filter '{0}' for {1} ... ".format(NAME, target_shortname))
     try:
         while True:
             state, event, key, value = (yield)
-            if listening_for_output_request:
-                if state == states.START:
-                    if event == events.CMD_LINE_OPTION:
-                        if key == constants.OUTPUT and value == target_shortname:
-                            listening_for_output_request = False
-                elif state == states.FUNCTION_HEAD:
+            if state == states.START or state == states.HEAD:
+                if event == events.CMD_LINE_OPTION or event == events.FUNCTION_DATA:
                     if key == constants.OUTPUT and value == target_shortname:
-                        listening_for_output_request = False
-                elif not (state == states.START or state == states.HEAD):
+                        send((state, event, key, value))
+                        break
+                else:
                     print("filter '{0}' stopping '{1}' ... ".format(NAME, target_shortname))
                     target.close()
-                    break
+                    raise StopIteration
             send((state, event, key, value))
+        while True:
+            send((yield))
     except GeneratorExit:
         print("stopped filter '{0}' for '{1}'".format(NAME, target_shortname))

@@ -28,4 +28,4 @@ class DMLFunctionNameError(DMLError):
         self.name = name
         
     def __str__(self):
-        return "function name'{0}' is not defined".format(self.name)
+        return "function name '{0}' is not defined".format(self.name)

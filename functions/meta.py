@@ -3,7 +3,7 @@ from src.dmlexceptions import DMLError
 import src.constants as constants
 import src.events as events
 
-def meta(broadcaster, push):
+def function(broadcaster, metadata, push, source):
     key = ""
     values = []
     KEY, VALUES = 0, 1
@@ -46,7 +46,7 @@ def meta(broadcaster, push):
 
 
 class DMLMetaSyntaxError(DMLError):
-    """Exception raised if a syntax error in the config function in the dml file occurs
+    """Exception raised if a syntax error in a meta function occurs
 
     Attributes:
         msg -- message
