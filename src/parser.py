@@ -8,10 +8,11 @@ contextmanager for those delegates
 """
 
 from contextlib import contextmanager
+
 import src.constants as constants
 import src.events as events
 import functions
-from dmlexceptions import DMLSyntaxError, DMLFunctionNameError
+from src.dmlexceptions import DMLSyntaxError, DMLFunctionNameError
 
 def parser_entry(broadcaster, metadata, push, source, get_next_whitespace, ignore_next_newline):
     """
@@ -101,8 +102,16 @@ def parser_entry(broadcaster, metadata, push, source, get_next_whitespace, ignor
             send((events.DATA, constants.TOKEN, token))
             
 def dispatch(broadcaster, metadata, push, source):
+    """
+    function dispatcher
+    
+    The function dispatcher gets control when a '@' is encountered. It then
+    checks if named function exists and sends the tokens to it until a '}'
+    is seen. Note that this behaviour (caller stays in control for exiting
+    from the token stream) is different from the rest of the parsing crew,
+    because it wants to make sure a function always returns.
+    """
     func_name = (yield)
-    #print(func_name)
     try:
         if func_name not in functions.__all__:
             raise DMLFunctionNameError(func_name)
@@ -110,16 +119,29 @@ def dispatch(broadcaster, metadata, push, source):
         if open_brackets != "{":
             raise DMLSyntaxError(open_brackets, "{")
         with parser_manager(functions.__dict__[func_name].function, broadcaster, metadata, push, source) as func:
-            while True:
-                token = (yield)
-                if token == "}":
-                    break
-                func(token)
+            try:
+                while True:
+                    token = (yield)
+                    if token == "}":
+                        break
+                    func(token)
+            except StopIteration:   # if the function return early, make sure
+                while True:         # not to send any tokens from the function
+                    token = (yield) # body or '}'
+                    if token == "}":
+                        break                    
     except GeneratorExit:
         pass
 
 
 def title_cast_or_act(broadcaster, push):
+    """
+    parses a title, cast or act declaration
+    
+    It gets called when a '=' is seen. It then lookes if there are more of
+    them, then it wants some data and afterwards the same number of '=' again
+    or it gets angry (raises DMLSyntaxError)
+    """
     token = (yield)
     send = broadcaster.send
     if token != "=":
@@ -166,6 +188,12 @@ def title_cast_or_act(broadcaster, push):
                         raise DMLSyntaxError(token, "==")
 
 def key(broadcaster, push):
+    """
+    key parser
+    
+    This little critter gets called when a whitespace or a tab is seen. It
+    sends data until a ':' or a newline is encountered
+    """
     broadcaster.send((events.KEY_START, None, None))
     while True:
         token = (yield)
@@ -180,11 +208,16 @@ def key(broadcaster, push):
         
 @contextmanager
 def parser_manager(coroutine, *args, **kwargs):
-    c = coroutine(*args, **kwargs)
-    c.next()
+    """
+    the parser contextmanager
+    
+    This handy little function initialized a parser coroutine and returns its
+    'send' function. It also swallows the StopIteration exception.
+    """
+    cor = coroutine(*args, **kwargs)
+    cor.next()
     try:
-        yield c.send
+        yield cor.send
     except StopIteration:
         pass
-    finally:
-        c.close()
+

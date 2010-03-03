@@ -19,13 +19,20 @@
 #       along with this program; if not, write to the Free Software
 #       Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
 #       MA 02110-1301, USA.
+from __future__ import print_function
 
+import sys
+import os.path
 from optparse import OptionParser
 
 import sinks
 
 if __name__ == '__main__':
-        
+    try:
+        import psyco
+        psyco.full()
+    except ImportError:
+        pass
     option_parser = OptionParser(usage="dml [options] FILE")
     add_option = option_parser.add_option
     sink_mods = [sinks.__dict__[mod] for mod in sinks.__all__]
@@ -37,9 +44,11 @@ if __name__ == '__main__':
                default=True, help="don't print status messages to stdout")
     (options, args) = option_parser.parse_args()
     if not args:
-        parser.print_help()
-        import sys
+        option_parser.print_help()
         sys.exit(2)
-
+    filename = args[0]
+    if not os.path.exists(filename):
+        print("Error: File '{0}' does not exist".format(filename))
+        sys.exit(2)
     from src import main
     main.main(args[0], options)

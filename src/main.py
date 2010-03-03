@@ -10,7 +10,6 @@ from src.parser import parser_entry
 import src.constants as constants
 import src.events as events
 
-
 class NullDevice():
     def write(self, dummy_out):
         pass
@@ -46,5 +45,3 @@ def main(dml_file, options=None):
         print(linecache.getline(dml_file, tokenizer.line_number))
         print("Error in line", tokenizer.line_number, ":", dml_error)
         sys.exit(1)
-    
-    # overwrite document settings
