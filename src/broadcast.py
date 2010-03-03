@@ -16,6 +16,9 @@ Besides the main loop, this is really the heart of dml. It
 from __future__ import print_function
 
 from collections import namedtuple
+from tempfile import NamedTemporaryFile
+from shutil import copyfile, move
+import os.path
 
 import sinks
 import src.states as states
@@ -35,48 +38,56 @@ def broadcast(metadata):
     sends:
     state, event, key, name
     """
-    MySink = namedtuple("MySink", "mod cor filters")
+    MySink = namedtuple("MySink", "mod cor filters tmpfile closed")
     mysinks = []
 
     state_machine = states.state_tracker()
     state = state_machine.next()
     sms = state_machine.send
-    state_might_be_start = True
-    while True:
-        if state == states.START:   # This is a message for the broadcaster
+    try:
+        while True:
+            if state == states.START:   # This is a message for the broadcaster
+                event, key, value = (yield)
+                state = sms(event)
+                if event == events.CMD_LINE_OPTION and key == constants.OUTPUT:
+                    mod = sinks.__dict__[value]
+                    tmpfile = NamedTemporaryFile(mode="w", delete=False)
+                    cor = mod.sink(metadata, tmpfile)
+                    cor.next()
+                    number_of_filters = len(mod.filters)
+                    myfilters = []
+                    for i in range(number_of_filters):
+                        target = cor if i + 1 >= number_of_filters else mod.filters[i + 1]
+                        myfilter = mod.filters[i](target, mod.SHORTNAME)
+                        myfilter.next()
+                        myfilters.append(myfilter)
+                    mysinks.append(MySink(mod, cor, myfilters, tmpfile, False))
+            else:
+                break
+        while True:         # Now comes everything after state 'Start'
+            for sink in mysinks:
+                if sink.closed:
+                    continue
+                try:
+                    if sink.filters:
+                        sink.filters[0].send((state, event, key, value))
+                    else:
+                        sink.cor.send((state, event, key, value))
+                # if the sink or any of the filters stops, we stop the whole chain
+                except StopIteration:
+                    sink.cor.close()
+                    sink._replace(closed= True)
+                    for myfilter in sink.filters:
+                        myfilter.close()
             event, key, value = (yield)
             state = sms(event)
-            if event == events.CMD_LINE_OPTION and key == constants.OUTPUT:
-                mod = sinks.__dict__[value]
-                cor = mod.sink(metadata)
-                cor.next()
-                number_of_filters = len(mod.filters)
-                myfilters = []
-                for i in range(number_of_filters):
-                    target = cor if i + 1 >= number_of_filters else mod.filters[i + 1]
-                    myfilter = mod.filters[i](target, mod.SHORTNAME)
-                    myfilter.next()
-                    myfilters.append(myfilter)
-                mysinks.append(MySink(mod, cor, myfilters))
-        else:
-            break
-    while True:         # Now comes everything after state 'Start'
-        closed_sinks = []
+    except GeneratorExit:
+        pass
+    finally:
         for sink in mysinks:
-            try:
-                if sink.filters:
-                    sink.filters[0].send((state, event, key, value))
-                else:
-                    sink.cor.send((state, event, key, value))
-            # if the sink or any of the filters stops, we stop the whole chain
-            except StopIteration:
-                sink.cor.close()
-                for myfilter in sink.filters:
-                    myfilter.close()
-                closed_sinks.append(sink)
-        # garbage collection
-        if closed_sinks:
-            for sink in closed_sinks:
-                mysinks.remove(sink)
-        event, key, value = (yield)
-        state = sms(event)
+            tmpfilename = sink.tmpfile.name
+            sink.tmpfile.close()
+            filename = os.path.join(metadata["working_dir"], metadata["name"] + "." + sink.mod.SHORTNAME)
+            print("written",filename)
+            move(sink.tmpfile.name, filename)
+            

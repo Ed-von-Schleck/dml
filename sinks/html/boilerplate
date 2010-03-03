@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+       "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<style type="text/css">
+h1#DML_title {
+   text-align: center;
+   clear: both;
+}
+
+h2#DML_cast {
+    text-align: center;
+    clear: both;
+    padding: 1em;
+    margin: 0;
+    page-break-before:always;
+}
+
+h3.DML_act {
+    text-align: center;
+    clear: both;
+    padding: 1em;
+    margin: 0;
+    page-break-before:always;
+}
+
+p.DML_title_value_line {
+    text-align: center;
+}
+
+span.DML_title_tag {
+    display: none;
+}
+
+span.DML_title_value {
+}
+
+p.DML_title_block {
+    text-align: center;
+    font-style: oblique;
+}
+
+p.DML_actor_description_line {
+}
+
+span.DML_actor_declaration {
+    display: block;
+    width: 49.5%;
+    text-align: right;
+    float: left;
+    font-variant: small-caps;
+}
+span.DML_actor_description {
+    padding-left: 1%;
+    display: block;
+    width: 49.5%;
+    text-align: left;
+    float: left;
+    font-style: oblique;
+}
+p.DML_block {
+    font-style: oblique;
+    text-align: justify;
+}
+
+p.DML_dialog_line {
+    text-indent: -1em;
+    margin: 0;
+    padding-left: 1em;
+    text-align: justify;
+}
+
+span.DML_actor {
+    font-variant: small-caps;
+}
+span.DML_stage_direction {
+    font-style: oblique;
+}
+</style>
+<title></title>
+</head>
+<body>
