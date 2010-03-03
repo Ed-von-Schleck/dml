@@ -24,7 +24,7 @@ def parser_entry(broadcaster, metadata, push, source, get_next_whitespace, ignor
         if token == "@":    # This checks for functions.
             with parser_manager(dispatch, broadcaster, metadata, push, source) as function_dispatch:
                 while True:
-                    function_dispatch.send((yield)) # the function dispatcher returns on token '}'.
+                    function_dispatch((yield)) # the function dispatcher returns on token '}'.
                     
         elif token == "\n":     # On the first newline don't send any special events.
             get_next_whitespace()   # Whitespace and tabs are key delimiters.
@@ -37,17 +37,17 @@ def parser_entry(broadcaster, metadata, push, source, get_next_whitespace, ignor
                 if token == "\t" or " " in token:   # This delimits key (actor or tag or sth.).
                     with parser_manager(key, broadcaster, push) as key_parser:
                         while True:
-                            key_parser.send((yield))    # The key parser return for token ':'.
+                            key_parser((yield))    # The key parser return for token ':'.
                             
                 elif token == "@":
                     with parser_manager(dispatch, broadcaster, metadata, push, source) as function_dispatch:
                         while True:
-                            function_dispatch.send((yield))
+                            function_dispatch((yield))
 
                 elif token == "=":  # This is a title, cast or act.
                     with parser_manager(title_cast_or_act, broadcaster, push) as tca:
                         while True:
-                            tca.send((yield))   # It will return when the same number of '=' is seen
+                            tca((yield))   # It will return when the same number of '=' is seen
                                                 # twice with data in-between
                 else:
                     send((events.BLOCK_START, None, None))  # If it's no function, key or title, cast or act,
@@ -57,17 +57,17 @@ def parser_entry(broadcaster, metadata, push, source, get_next_whitespace, ignor
             elif token == "@":
                 with parser_manager(dispatch, broadcaster, metadata, push, source) as function_dispatch:
                     while True:
-                        function_dispatch.send((yield))
+                        function_dispatch((yield))
                         
             elif token == "\t" or " " in token:
                 with parser_manager(key, broadcaster, push) as key_parser:
                     while True:
-                        key_parser.send((yield))
+                        key_parser((yield))
                         
             elif token == "=":
                 with parser_manager(title_cast_or_act, broadcaster, push) as tca:
                     while True:
-                        tca.send((yield))
+                        tca((yield))
             else:
                 send((events.DATA, constants.TOKEN, token))
                 

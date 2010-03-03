@@ -13,7 +13,6 @@ import os.path
 import src.constants as constants
 import src.states as states
 import src.events as events
-from filters.stopnotrequested import filter as stop_if_not_requested
 
 NAME = "drama markup language"
 SHORTNAME = "dml"

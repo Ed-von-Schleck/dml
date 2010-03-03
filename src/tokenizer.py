@@ -36,7 +36,7 @@ class Tokenizer(object):
                             self._lex_file.push_source,
                             self.get_next_whitespace,
                             self.ignore_next_newline) as entry:
-            send = entry.send
+            
             for token in self._lex_file:
                 if token == "#":
                     # my own commenting logic, because shlex doesn't give me
@@ -51,6 +51,11 @@ class Tokenizer(object):
                 if self._ignore_next_newline:
                     self._ignore_next_newline = False
                     self._lex_file.whitespace = self._lex_file.whitespace.replace("\n", "")
-                send(token)
+                entry(token)
+            
+            # I would rather do that:
+            #map(entry, self._lex_file)
+            # but then I guess I'd have to write my own lexer ...
+            
             broadcaster.send((events.END, None, None))
         

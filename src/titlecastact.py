@@ -6,12 +6,12 @@ def title_cast_or_act(broadcaster, push):
     token = (yield)
     send = broadcaster.send
     if token != "=":
-        broadcaster.send((events.TITLE_DEL, None, None))
+        send((events.TITLE_DEL, None, None))
         while True:
             send((events.DATA, constants.TOKEN, token))
             token = (yield)
             if token == "=":
-                broadcaster.send((events.TITLE_DEL, None, None))
+                send((events.TITLE_DEL, None, None))
                 break
     else:
         token = (yield)

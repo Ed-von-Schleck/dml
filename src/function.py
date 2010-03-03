@@ -19,8 +19,7 @@ def dispatch(broadcaster, metadata, push, source):
             while True:
                 token = (yield)
                 if token == "}":
-                    func.close()
                     break
-                func.send(token)
+                func(token)
     except GeneratorExit:
         pass
