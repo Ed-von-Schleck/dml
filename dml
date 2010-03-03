@@ -22,17 +22,17 @@
 
 from optparse import OptionParser
 
-if __name__ == '__main__':   
+import sinks
+
+if __name__ == '__main__':
+        
     option_parser = OptionParser(usage="dml [options] FILE")
     add_option = option_parser.add_option
-    add_option("-p", "--pdf", dest="pdf", action="store_true",
-               default=False, help="generate PDF ouput")
-    add_option("-t", "--html", dest="html", action="store_true",
-               default=False, help="generate HTML ouput")
-    add_option("-d", "--dml", dest="dml", action="store_true",
-               default=False, help="generate HTML ouput")
-    add_option("-b", "--debug", dest="debug", action="store_true",
-               default=False, help="generate debug ouput")
+    sink_mods = [sinks.__dict__[mod] for mod in sinks.__all__]
+    for mod in sink_mods:
+        add_option("-" + mod.VERYSHORTNAME, "--" + mod.SHORTNAME,
+                   dest=mod.SHORTNAME, action="store_true",
+                   default=False, help=mod.DESCRIPTION)
     add_option("-q", "--quiet", action="store_false", dest="verbose",
                default=True, help="don't print status messages to stdout")
     (options, args) = option_parser.parse_args()

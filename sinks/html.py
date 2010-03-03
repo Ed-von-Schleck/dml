@@ -12,7 +12,7 @@ NAME = "Hypertext Markup Language"
 SHORTNAME = "html"
 VERYSHORTNAME = "t"
 DESCRIPTION = "generates HTML output"
-filters = (stop_if_not_requested,)
+filters = ()
 
 def sink(metadata):
     print("starting sink '{0}' ...".format(SHORTNAME))

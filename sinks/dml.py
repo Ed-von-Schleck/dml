@@ -19,7 +19,7 @@ NAME = "drama markup language"
 SHORTNAME = "dml"
 VERYSHORTNAME = "d"
 DESCRIPTION = "generates DML output"
-filters = (stop_if_not_requested,)
+filters = ()
 
 def sink(metadata):
     print("starting sink '{0}' ...".format(SHORTNAME))

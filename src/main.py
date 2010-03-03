@@ -10,26 +10,30 @@ from src.parserentry import parser_entry
 import src.constants as constants
 import src.events as events
 
+
 class NullDevice():
     def write(self, dummy_out):
         pass
 
 def main(dml_file, options=None):
-    if options is not None and not options.verbose:
-        sys.stdout = NullDevice()
-    
     filepath, filename = os.path.split(dml_file)
     name, ext = os.path.splitext(os.path.basename(dml_file))
     del ext
     metadata = {"filepath": filepath, "name": name, "filename": filename, "working_dir": os.getcwd()}
+    
+    # Initialize broadcaster, the endpoint of the parsing chain
     broadcaster = broadcast(metadata)
     broadcaster.next()
     
-    # TODO: generic solution
-    if options is not None and options.pdf:
-        broadcaster.send((events.CMD_LINE_OPTION, constants.OUTPUT, "pdf"))
-    if options is not None and options.html:
-        broadcaster.send((events.CMD_LINE_OPTION, constants.OUTPUT, "html"))
+    if options is not None:
+        if not options.verbose:
+            sys.stdout = NullDevice()
+        # This won't win a beaty contest, but seems robust.
+        import sinks
+        sink_mods = [sinks.__dict__[mod] for mod in sinks.__all__]
+        for mod in sink_mods:
+            if options.__dict__[mod.SHORTNAME]:
+                broadcaster.send((events.CMD_LINE_OPTION, constants.OUTPUT, mod.SHORTNAME))
 
     try:
         with open(dml_file) as dml:

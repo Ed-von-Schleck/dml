@@ -12,7 +12,7 @@ def state_tracker():
     # this is ugly, but the information has to go somewhere
     transitions = dict((
         ((START, events.CMD_LINE_OPTION), START),
-        ((START, events.FUNCTION_DATA), START),
+        ((START, events.FUNCTION_DATA), HEAD),
         ((START, events.TITLE_DEL), TITLE),
         ((START, events.CAST_DEL), CAST),
         ((START, events.ACT_DEL), ACT),

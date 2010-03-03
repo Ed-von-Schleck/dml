@@ -19,6 +19,8 @@ from collections import namedtuple
 
 import sinks
 import src.states as states
+import src.constants as constants
+import src.events as events
 
 def broadcast(metadata):
     """
@@ -35,25 +37,30 @@ def broadcast(metadata):
     """
     MySink = namedtuple("MySink", "mod cor filters")
     mysinks = []
-    for sink_name in sinks.__all__:
-        filters = []
-        mod = sinks.__dict__[sink_name]
-        cor = mod.sink(metadata)
-        cor.next()
-        number_of_filters = len(mod.filters)
-        for i in range(number_of_filters):
-            target = cor if i + 1 >= number_of_filters else mod.filters[i + 1]
-            myfilter = mod.filters[i](target, mod.SHORTNAME)
-            myfilter.next()
-            filters.append(myfilter)
-        mysinks.append(MySink(mod, cor, filters))
 
     state_machine = states.state_tracker()
     state = state_machine.next()
     sms = state_machine.send
+    state_might_be_start = True
     while True:
-        event, key, value = (yield)
-        state = sms(event)
+        if state == states.START:   # This is a message for the broadcaster
+            event, key, value = (yield)
+            state = sms(event)
+            if event == events.CMD_LINE_OPTION and key == constants.OUTPUT:
+                mod = sinks.__dict__[value]
+                cor = mod.sink(metadata)
+                cor.next()
+                number_of_filters = len(mod.filters)
+                myfilters = []
+                for i in range(number_of_filters):
+                    target = cor if i + 1 >= number_of_filters else mod.filters[i + 1]
+                    myfilter = mod.filters[i](target, mod.SHORTNAME)
+                    myfilter.next()
+                    myfilters.append(myfilter)
+                mysinks.append(MySink(mod, cor, myfilters))
+        else:
+            break
+    while True:         # Now comes everything after state 'Start'
         closed_sinks = []
         for sink in mysinks:
             try:
@@ -71,4 +78,5 @@ def broadcast(metadata):
         if closed_sinks:
             for sink in closed_sinks:
                 mysinks.remove(sink)
-            closed_sinks = []
+        event, key, value = (yield)
+        state = sms(event)
