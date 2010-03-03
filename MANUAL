@@ -4,7 +4,8 @@ syntax of dml files.
 Usage
 =====
 
-If you type 'dml' on the commandline, you should see something like that:
+If you type 'dml --help' on the command line, you should see something like
+that:
 
 Usage: dml [options] FILE
 
@@ -19,7 +20,8 @@ FILE must be a valid dml-file. The next section describes the syntax of it. If
 that file does not exist, dml with print an Error and exit.
 
 The options might differ if you have other backends installed. What is always
-there is -q, which supresses output in the console, and -h to show the help.
+there is '-q' or '--quiet', which supresses output in the console, and '-h' or
+'--help' to show the help.
 
 Any other option controls the various ouptuts. Each will write a file in the
 working directory with the filename (without the '.dml' extension) + the
@@ -28,12 +30,37 @@ backend extension. For example:
 $ dml --html path/to/my_funny_play.dml
 
 will write a 'my_funny_play.html' into your current directory. Any existing
-file named 'my_funny_play.html' will be overwritten.
+file named 'my_funny_play.html' in this directory will be overwritten.
+
+
+Backends
+--------
+
+There are two kinds of backends: sinks and postprocessors.
+
+Sinks directly feed off the parser (they are called sinks because it's a
+streaming parser, and every event generated in the parser will eventually land
+there, but they themselves don't generate or forward any event. They are the
+end of the event food chain). They are usually implemented without third party
+tools.
+
+Postprocessors don't recieve any events from anything at all, they rely on
+a sink to already having done the dirty work. They just transform the output of
+a sink into something else (usually a pdf). So you might have a LaTeX sink and
+a LaTeX2pdf postprocessor, or a html sink and a html2pdf postprocessor. Post-
+processors usually have a '2' in their name to indicate where they get their
+source from. If a postprocessor is selected, it will automatically activate
+it's corresponding sink, whether you selected it or not. Postprocessors usually
+require a third party tool (like LaTeX or pisa). These tools may not be
+automatically installed if you install dml. Refer to the READMEs in the 
+'postprocessors' folder for installation help.
+
 
 dml Syntax
 ==========
 
-For a for more systematic explanation, look at the BNF part below.
+For a for more scientific explanation, look at the BNF part below.
+
 
 General Syntax
 --------------
@@ -49,7 +76,7 @@ it's so funny
     author: me
     date: 03/04/2010
     
-That is:
+OK, that's:
  * title separated with "="
  * title, block and tag/value pairs separated by two newlines
  * tag/value lines indented
@@ -95,6 +122,7 @@ direction enclosed with '<' and '>'.
 
 How all of this will eventually be displayed is up to the backend.
 
+
 Functions
 ---------
 At any time you might write a function, starting with '@', followerd by a
@@ -102,7 +130,8 @@ function name and then a function block delimited by '{' and '}'. Here's
 what they do:
 
  -- meta:
-Used to declare metadata in key/value pairs. For example:
+Used to declare metadata in key/value pairs. Only useful in the header of
+the dml file. For example:
 
 @meta {
 table_of_contents: True
@@ -115,11 +144,13 @@ Include the contents of another dml-file in your play. Example:
 
 The file to be included must be in the directory of the parent file or in
 your working (current) directory.
-BNF
----
 
-My BNF knowledge is getting a bit rusty, please report any error you see here.
-This is the syntax as I believe it to be:
+
+Syntax in BNF
+-------------
+
+My BNF foo is getting a bit rusty, please report any error you see here. I expect
+pretty obvios one. This is the syntax as I believe it to be:
 
 DML             ::= FUNCTION | TITLE | CAST | ACT | BLOCK | LINE | KEY | VALUE
 FUNCTION        ::= "@" WORD "{" FUNCTION_BODY "}"
@@ -138,5 +169,5 @@ WORD            ::= <letters, numbers, stuff like that>
 FUNCTION_BODY   ::= <that's up to the function>
 
 Please note that my lexer ignores whitespace and tabs except after newlines,
-so the BNF up there is not entirely correct, nor is it actually used to
+so the BNF up there is neither entirely correct, nor is it actually used to
 implement the parser.
