@@ -14,13 +14,12 @@ import src.states as states
 import src.events as events
 
 NAME = "debug"
-SHORTNAME = "debug"
-VERYSHORTNAME = "b"
+EXTENSION = "dbg"
 DESCRIPTION = "generates debug output"
 filters = ()
 
 def sink(metadata, file_obj):
-    print("starting sink '{0}' ...".format(SHORTNAME))
+    print("starting sink '{0}' ...".format(NAME))
     try:
         count = 0
         header = "\n{0: ^19}|{1: ^20}|{2: ^20}|{3: ^19}\n".format("state", "event", "key", "token")
@@ -41,4 +40,4 @@ def sink(metadata, file_obj):
     except GeneratorExit:
         pass
     finally:
-        print("stopped sink '{0}'".format(SHORTNAME))
+        print("stopped sink '{0}'".format(NAME))

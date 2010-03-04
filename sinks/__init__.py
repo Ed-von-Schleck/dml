@@ -1,3 +1,3 @@
-__all__ = ["html", "dml", "debug"]
+__all__ = ["html", "dml", "debug", "latex"]
 
-import html, dml, debug
+import html, dml, debug, latex

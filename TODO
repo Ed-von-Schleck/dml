@@ -21,8 +21,8 @@ Possibly After 0.1 Release, But Then As Fast As Possible:
  * make rpm, deb, and a windows installer
  * and I mean for each stable release
  * write man page
- * write a lilypond function
- * write some image functions
+ * write a lilypond macro
+ * write some image macros
 
 Nice To Haves, But Check First If It Really Makes Sense:
  * Unix pipe ouput of sinks (but how with multiple sinks?)
@@ -41,7 +41,7 @@ Always Good:
  * write more documentation
  * write more sinks
  * write more postprocessors
- * write more functions
+ * write more macros
  * code cleanups
  * check if docs are still up-to-date
  

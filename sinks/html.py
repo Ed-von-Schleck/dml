@@ -7,14 +7,13 @@ import src.constants as constants
 import src.states as states
 import src.events as events
 
-NAME = "Hypertext Markup Language"
-SHORTNAME = "html"
-VERYSHORTNAME = "t"
+NAME = "html"
+EXTENSION = "html"
 DESCRIPTION = "generates HTML output"
 filters = ()
 
 def sink(metadata, file_obj):
-    print("starting sink '{0}' ...".format(SHORTNAME))
+    print("starting sink '{0}' ...".format(NAME))
     try:
         with open("sinks/html/boilerplate") as boilerplate:
             copyfileobj(boilerplate, file_obj)
@@ -107,4 +106,4 @@ def sink(metadata, file_obj):
     except GeneratorExit:
         pass
     finally:
-        print("stopped sink '{0}'".format(SHORTNAME))
+        print("stopped sink '{0}'".format(NAME))

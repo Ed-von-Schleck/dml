@@ -31,8 +31,8 @@ def main(dml_file, options=None):
         import sinks
         sink_mods = [sinks.__dict__[mod] for mod in sinks.__all__]
         for mod in sink_mods:
-            if options.__dict__[mod.SHORTNAME]:
-                broadcaster.send((events.CMD_LINE_OPTION, constants.OUTPUT, mod.SHORTNAME))
+            if options.__dict__[mod.NAME]:
+                broadcaster.send((events.CMD_LINE_OPTION, constants.OUTPUT, mod.NAME))
 
     try:
         with open(dml_file) as dml:

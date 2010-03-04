@@ -1,9 +1,6 @@
 """
-a dml sink
+a latex sink
 
-Yes, this doesn't make much sense for an end user, but it's great for testing
-and debugging. No Functions though (wouldn't make much sense if you think about
-it.
 """
 
 from __future__ import print_function
@@ -14,10 +11,9 @@ import src.constants as constants
 import src.states as states
 import src.events as events
 
-NAME = "dml"
-EXTENSION = "dml"
-VERYSHORTNAME = "d"
-DESCRIPTION = "generates DML output"
+NAME = "latex"
+EXTENSION = "tex"
+DESCRIPTION = "generates latex output"
 filters = ()
 
 def sink(metadata, file_obj):
