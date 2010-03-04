@@ -17,7 +17,7 @@ class DMLSyntaxError(DMLError):
     def __str__(self):
         return "unexpected token '{0}', expected '{1}'".format(self.is_expr, self.should_be_expr)
                 
-class DMLFunctionNameError(DMLError):
+class DMLMacroNameError(DMLError):
     """Exception raised if macro names are not defined
 
     Attributes:

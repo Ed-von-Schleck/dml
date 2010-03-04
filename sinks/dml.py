@@ -2,7 +2,7 @@
 a dml sink
 
 Yes, this doesn't make much sense for an end user, but it's great for testing
-and debugging. No Functions though (wouldn't make much sense if you think about
+and debugging. No Macros though (wouldn't make much sense if you think about
 it.
 """
 

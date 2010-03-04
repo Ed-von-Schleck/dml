@@ -10,4 +10,4 @@ table_of_contents: true
     for token in tokenizer:
         if token[0] == "!":
             if token[1:] not in macros.macros:
-                raise DMLFunctionNameError(token[1:])
+                raise DMLMacroNameError(token[1:])

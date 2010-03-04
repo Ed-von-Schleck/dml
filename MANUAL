@@ -136,7 +136,7 @@ direction enclosed with '<' and '>'.
 How all of this will eventually be displayed is up to the backend.
 
 
-Functions
+Macros
 ---------
 
 At any time you might write a macro, starting with '@', followerd by a

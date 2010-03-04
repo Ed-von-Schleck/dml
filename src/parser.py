@@ -12,7 +12,7 @@ from contextlib import contextmanager
 import src.constants as constants
 import src.events as events
 import macros
-from src.dmlexceptions import DMLSyntaxError, DMLFunctionNameError
+from src.dmlexceptions import DMLSyntaxError, DMLMacroNameError
 
 def parser_entry(broadcaster, metadata, push, source, get_next_whitespace, ignore_next_newline):
     """
@@ -114,7 +114,7 @@ def dispatch(broadcaster, metadata, push, source):
     func_name = (yield)
     try:
         if func_name not in macros.__all__:
-            raise DMLFunctionNameError(func_name)
+            raise DMLMacroNameError(func_name)
         open_brackets = (yield)
         if open_brackets != "{":
             raise DMLSyntaxError(open_brackets, "{")
