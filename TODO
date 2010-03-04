@@ -24,7 +24,7 @@ Possibly After 0.1 Release, But Then As Fast As Possible:
 Nice To Haves, But Check First If It Really Makes Sense:
  * Unix pipe ouput of sinks (but how with multiple sinks?)
  * stdout output on sinks (see above)
- * moev sinks to own threads/processes (what with postprocessors?)
+ * move sinks to own threads/processes (what with postprocessors?)
  
 Higher Goals:
  * get into official Fedora (Ubuntu, SuSE, Debian) repository
