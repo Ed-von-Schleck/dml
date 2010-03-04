@@ -2,26 +2,36 @@ There is still a lot to do:
 
 To Make It Fully Work:
  * add postprocessor logic
+ * add i18n
 
-Before Any Release Attempt:
+Before 0.1 Release Attempt:
  * make unittests cover 100%
- * write installation instructions
  * make distutils egg
- 
-Possibly After First Release, But Then As Fast As Possible:
- * write docs for developers
- * make a windows installer
+ * write installation instructions
+ * doublecheck MANUAL
  * get an online presence for users (for devs github is enough)
  
+Possibly After 0.1 Release, But Then As Fast As Possible:
+ * write docs for developers, esp. some nice state machine graphs
+ * make rpm, deb, and a windows installer
+ * and I mean for each stable release
+ * write man page
+ * add syntax highligher to gedit/kile/...
+ 
 Higher Goals:
- * get into official Fedora (Ubuntu, SuSE) repository
+ * get into official Fedora (Ubuntu, SuSE, Debian) repository
+ * write a gedit extension
+ * and emacs support
+ * and other IDE integration
+ * and whatnot
  
 Always Good:
+ * write more documentation
  * write more sinks
  * write more postprocessors
  * write more functions
  * code cleanups
  * check if docs are still up-to-date
  
-If you want to help, please write me a mail:
+There is a lot to do, even for non-coders. If you want to help, please write to:
 Christian Schramm <christian.h.m.schramm@gmail.com>
