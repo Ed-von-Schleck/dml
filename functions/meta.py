@@ -8,7 +8,10 @@ def function(broadcaster, metadata, push, source):
     values = []
     KEY, VALUES = 0, 1
     pointer = KEY
-    switch = {"table_of_contents": (events.FUNCTION_DATA, constants.TOC)}
+    switch = {
+        "table_of_contents": (events.FUNCTION_DATA, constants.TOC),
+        "paper_size": (events.FUNCTION_DATA, constants.PAPER_SIZE),
+        }
     try:
         while True:
             token = (yield)
