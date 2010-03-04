@@ -1,4 +1,4 @@
-dml is licensed under the GNU Public License Version 3, see COPYING
+dml is licensed under the GNU Public License Version 3, see COPYING.
 
 See INSTALL for instructions on how to install dml on your system.
 
@@ -10,5 +10,5 @@ http://github.com/Ed-von-Schleck/dml
 Please report any bugs you find to:
 http://github.com/Ed-von-Schleck/dml/issues
 
-If you want to help with the development of dml, please contact me:
+If you want to help with the development of dml, see TODO and/or contact me:
 Christian Schramm <christian.h.m.schramm@gmail.com>

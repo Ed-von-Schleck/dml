@@ -1,0 +1,27 @@
+There is still a lot to do:
+
+To Make It Fully Work:
+ * add postprocessor logic
+
+Before Any Release Attempt:
+ * make unittests cover 100%
+ * write installation instructions
+ * make distutils egg
+ 
+Possibly After First Release, But Then As Fast As Possible:
+ * write docs for developers
+ * make a windows installer
+ * get an online presence for users (for devs github is enough)
+ 
+Higher Goals:
+ * get into official Fedora (Ubuntu, SuSE) repository
+ 
+Always Good:
+ * write more sinks
+ * write more postprocessors
+ * write more functions
+ * code cleanups
+ * check if docs are still up-to-date
+ 
+If you want to help, please write me a mail:
+Christian Schramm <christian.h.m.schramm@gmail.com>
