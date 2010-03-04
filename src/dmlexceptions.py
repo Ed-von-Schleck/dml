@@ -18,14 +18,14 @@ class DMLSyntaxError(DMLError):
         return "unexpected token '{0}', expected '{1}'".format(self.is_expr, self.should_be_expr)
                 
 class DMLFunctionNameError(DMLError):
-    """Exception raised if function names are not defined
+    """Exception raised if macro names are not defined
 
     Attributes:
-        name -- undefined function
+        name -- undefined macro
     """
 
     def __init__(self, name):
         self.name = name
         
     def __str__(self):
-        return "function name '{0}' is not defined".format(self.name)
+        return "macro name '{0}' is not defined".format(self.name)

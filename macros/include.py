@@ -6,7 +6,7 @@ from src.dmlexceptions import DMLError
 import src.constants as constants
 import src.events as events
 
-def function(broadcaster, metadata, push, source):
+def macro(broadcaster, metadata, push, source):
     try:
         while True:
             token = (yield)
@@ -27,7 +27,7 @@ def function(broadcaster, metadata, push, source):
         source(open(full_filename), full_filename)
 
 class DMLIncludeSyntaxError(DMLError):
-    """Exception raised if a syntax error in a include function occurs
+    """Exception raised if a syntax error in a include macro occurs
 
     Attributes:
         msg -- message

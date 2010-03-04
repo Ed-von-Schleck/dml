@@ -3,14 +3,14 @@ from src.dmlexceptions import DMLError
 import src.constants as constants
 import src.events as events
 
-def function(broadcaster, metadata, push, source):
+def macro(broadcaster, metadata, push, source):
     key = ""
     values = []
     KEY, VALUES = 0, 1
     pointer = KEY
     switch = {
-        "table_of_contents": (events.FUNCTION_DATA, constants.TOC),
-        "paper_size": (events.FUNCTION_DATA, constants.PAPER_SIZE),
+        "table_of_contents": (events.MACRO_DATA, constants.TOC),
+        "paper_size": (events.MACRO_DATA, constants.PAPER_SIZE),
         }
     try:
         while True:
@@ -48,7 +48,7 @@ def function(broadcaster, metadata, push, source):
 
 
 class DMLMetaSyntaxError(DMLError):
-    """Exception raised if a syntax error in a meta function occurs
+    """Exception raised if a syntax error in a meta macro occurs
 
     Attributes:
         msg -- message

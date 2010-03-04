@@ -42,11 +42,11 @@ def sink(metadata, file_obj):
                 elif key == constants.FORCE_NEWLINE:
                     write("<br />")
             
-            #elif event == events.FUNCTION_START:
+            #elif event == events.MACRO_START:
             #    file.write("".join(("@", value, " {\n")))
-            #elif event == events.FUNCTION_END:
+            #elif event == events.MACRO_END:
             #    file.write("}")
-            #elif event == events.FUNCTION_DATA:
+            #elif event == events.MACRO_DATA:
             #    file.write("".join((constants.names[key], ": ", value, "\n")))
                 
             elif event == events.TITLE_DEL:

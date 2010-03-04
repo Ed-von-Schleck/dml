@@ -139,9 +139,9 @@ How all of this will eventually be displayed is up to the backend.
 Functions
 ---------
 
-At any time you might write a function, starting with '@', followerd by a
-function name and then a function block delimited by '{' and '}'. They are not
-really functions, because dml isn't a programming language, but anyways: Here's
+At any time you might write a macro, starting with '@', followerd by a
+macro name and then a macro block delimited by '{' and '}'. They are not
+really macros, because dml isn't a programming language, but anyways: Here's
 what they do:
 
 meta:
@@ -167,8 +167,8 @@ Syntax in BNF
 My BNF foo is getting a bit rusty, please report any error you see here. I expect
 pretty obvios one. This is the syntax as I believe it to be:
 
-DML             ::= FUNCTION | TITLE | CAST | ACT | BLOCK | LINE | KEY | VALUE
-FUNCTION        ::= "@" WORD "{" FUNCTION_BODY "}"
+DML             ::= MACRO | TITLE | CAST | ACT | BLOCK | LINE | KEY | VALUE
+MACRO           ::= "@" WORD "{" MACRO_BODY "}"
 TITLE           ::= NEWLINE+ "=" WORD* "="
 CAST            ::= NEWLINE+ "==" WORD* "=="
 ACT             ::= NEWLINE+ "===" WORD* "==="
@@ -181,7 +181,7 @@ NEWLINE         ::= "\n"
 WHITESPACE      ::= " "
 TAB             ::= "\n"
 WORD            ::= <letters, numbers, stuff like that>
-FUNCTION_BODY   ::= <that's up to the function>
+MACRO_BODY   ::= <that's up to the macro>
 
 Please note that my lexer ignores whitespace and tabs except after newlines,
 so the BNF up there is neither entirely correct, nor is it actually used to

@@ -12,7 +12,7 @@ def state_tracker():
     # this is ugly, but the information has to go somewhere
     transitions = dict((
         ((START, events.CMD_LINE_OPTION), START),
-        ((START, events.FUNCTION_DATA), HEAD),
+        ((START, events.MACRO_DATA), HEAD),
         ((START, events.TITLE_DEL), TITLE),
         ((START, events.CAST_DEL), CAST),
         ((START, events.ACT_DEL), ACT),
@@ -24,7 +24,7 @@ def state_tracker():
         ((HEAD, events.TITLE_DEL), TITLE),
         ((HEAD, events.CAST_DEL), CAST),
         ((HEAD, events.ACT_DEL), ACT),
-        ((HEAD, events.FUNCTION_DATA), HEAD),
+        ((HEAD, events.MACRO_DATA), HEAD),
         
         ((TITLE, events.DATA), TITLE),
         ((TITLE, events.TITLE_DEL), TITLE_BODY),
@@ -45,11 +45,11 @@ def state_tracker():
         
         ((TITLE_BLOCK, events.DATA), TITLE_BLOCK),
         ((TITLE_BLOCK, events.NEW_PARAGRAPH), TITLE_BODY),
-        ((TITLE_BODY, events.FUNCTION_DATA), TITLE_BODY),
+        ((TITLE_BODY, events.MACRO_DATA), TITLE_BODY),
         
         ((CAST, events.DATA), CAST),
         ((CAST, events.CAST_DEL), CAST_BODY),
-        ((CAST, events.FUNCTION_DATA), CAST),
+        ((CAST, events.MACRO_DATA), CAST),
         
         ((CAST_BODY, events.DATA), CAST_BODY),
         ((CAST_BODY, events.ACT_DEL), ACT),
@@ -70,7 +70,7 @@ def state_tracker():
         ((ACT, events.DATA), ACT),
         ((ACT, events.ACT_DEL), BODY),
         
-        ((BODY, events.FUNCTION_DATA), BODY),
+        ((BODY, events.MACRO_DATA), BODY),
         ((BODY, events.ACT_DEL), ACT),
         ((BODY, events.NEW_PARAGRAPH), BODY),
         ((BODY, events.BLOCK_START), BLOCK),

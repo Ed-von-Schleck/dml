@@ -2,13 +2,13 @@ from tokenizer import Tokenizer
 from dmlexceptions import DMLSyntaxError
 from nose.tools import raises
 
-def correct_function_syntax_test():
-    function_string = """
+def correct_macro_syntax_test():
+    macro_string = """
 !config {
 output: pdf, html
 table_of_contents: true
 }"""
-    tokenizer = Tokenizer(function_string)
+    tokenizer = Tokenizer(macro_string)
     for token in tokenizer:
         if token[0] == "!":
             open_brackets = tokenizer.next()
@@ -16,13 +16,13 @@ table_of_contents: true
                 raise DMLSyntaxError(open_brackets, "{")
 
 @raises(DMLSyntaxError)
-def incorrect_function_syntax_1_test():
-    function_string = """
+def incorrect_macro_syntax_1_test():
+    macro_string = """
 !config fail_me {
 output: pdf, html
 table_of_contents: true
 }"""
-    tokenizer = Tokenizer(function_string)
+    tokenizer = Tokenizer(macro_string)
     for token in tokenizer:
        if token[0] == "!":
             open_brackets = tokenizer.next()

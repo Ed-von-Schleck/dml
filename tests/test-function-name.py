@@ -1,13 +1,13 @@
-import functions
+import macros
 
-def correct_function_name_test():
-    function_string = """
+def correct_macro_name_test():
+    macro_string = """
 !config {
 output: pdf, html
 table_of_contents: true
 }"""
-    tokenizer = Tokenizer(function_string)
+    tokenizer = Tokenizer(macro_string)
     for token in tokenizer:
         if token[0] == "!":
-            if token[1:] not in functions.functions:
+            if token[1:] not in macros.macros:
                 raise DMLFunctionNameError(token[1:])

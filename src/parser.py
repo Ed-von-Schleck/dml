@@ -11,7 +11,7 @@ from contextlib import contextmanager
 
 import src.constants as constants
 import src.events as events
-import functions
+import macros
 from src.dmlexceptions import DMLSyntaxError, DMLFunctionNameError
 
 def parser_entry(broadcaster, metadata, push, source, get_next_whitespace, ignore_next_newline):
@@ -28,10 +28,10 @@ def parser_entry(broadcaster, metadata, push, source, get_next_whitespace, ignor
     
     while True:
         token = (yield)
-        if token == "@":    # This checks for functions.
-            with parser_manager(dispatch, broadcaster, metadata, push, source) as function_dispatch:
+        if token == "@":    # This checks for macros.
+            with parser_manager(dispatch, broadcaster, metadata, push, source) as macro_dispatch:
                 while True:
-                    function_dispatch((yield)) # the function dispatcher returns on token '}'.
+                    macro_dispatch((yield)) # the macro dispatcher returns on token '}'.
                     
         elif token == "\n":     # On the first newline don't send any special events.
             get_next_whitespace()   # Whitespace and tabs are key delimiters.
@@ -47,9 +47,9 @@ def parser_entry(broadcaster, metadata, push, source, get_next_whitespace, ignor
                             key_parser((yield))    # The key parser return for token ':'.
                             
                 elif token == "@":
-                    with parser_manager(dispatch, broadcaster, metadata, push, source) as function_dispatch:
+                    with parser_manager(dispatch, broadcaster, metadata, push, source) as macro_dispatch:
                         while True:
-                            function_dispatch((yield))
+                            macro_dispatch((yield))
 
                 elif token == "=":  # This is a title, cast or act.
                     with parser_manager(title_cast_or_act, broadcaster, push) as tca:
@@ -57,14 +57,14 @@ def parser_entry(broadcaster, metadata, push, source, get_next_whitespace, ignor
                             tca((yield))   # It will return when the same number of '=' is seen
                                                 # twice with data in-between
                 else:
-                    send((events.BLOCK_START, None, None))  # If it's no function, key or title, cast or act,
+                    send((events.BLOCK_START, None, None))  # If it's no macro, key or title, cast or act,
                                                             # it must be a new block
                     send((events.DATA, constants.TOKEN, token))
             
             elif token == "@":
-                with parser_manager(dispatch, broadcaster, metadata, push, source) as function_dispatch:
+                with parser_manager(dispatch, broadcaster, metadata, push, source) as macro_dispatch:
                     while True:
-                        function_dispatch((yield))
+                        macro_dispatch((yield))
                         
             elif token == "\t" or " " in token:
                 with parser_manager(key, broadcaster, push) as key_parser:
@@ -103,30 +103,30 @@ def parser_entry(broadcaster, metadata, push, source, get_next_whitespace, ignor
             
 def dispatch(broadcaster, metadata, push, source):
     """
-    function dispatcher
+    macro dispatcher
     
-    The function dispatcher gets control when a '@' is encountered. It then
-    checks if named function exists and sends the tokens to it until a '}'
+    The macro dispatcher gets control when a '@' is encountered. It then
+    checks if named macro exists and sends the tokens to it until a '}'
     is seen. Note that this behaviour (caller stays in control for exiting
     from the token stream) is different from the rest of the parsing crew,
-    because it wants to make sure a function always returns.
+    because it wants to make sure a macro always returns.
     """
     func_name = (yield)
     try:
-        if func_name not in functions.__all__:
+        if func_name not in macros.__all__:
             raise DMLFunctionNameError(func_name)
         open_brackets = (yield)
         if open_brackets != "{":
             raise DMLSyntaxError(open_brackets, "{")
-        with parser_manager(functions.__dict__[func_name].function, broadcaster, metadata, push, source) as func:
+        with parser_manager(macros.__dict__[func_name].macro, broadcaster, metadata, push, source) as func:
             try:
                 while True:
                     token = (yield)
                     if token == "}":
                         break
                     func(token)
-            except StopIteration:   # if the function return early, make sure
-                while True:         # not to send any tokens from the function
+            except StopIteration:   # if the macro return early, make sure
+                while True:         # not to send any tokens from the macro
                     token = (yield) # body or '}'
                     if token == "}":
                         break                    
@@ -211,8 +211,8 @@ def parser_manager(coroutine, *args, **kwargs):
     """
     the parser contextmanager
     
-    This handy little function initialized a parser coroutine and returns its
-    'send' function. It also swallows the StopIteration exception.
+    This handy little macro initialized a parser coroutine and returns its
+    'send' macro. It also swallows the StopIteration exception.
     """
     cor = coroutine(*args, **kwargs)
     cor.next()
