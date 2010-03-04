@@ -47,10 +47,10 @@ end of the event food chain). They don't require third party tools to be
 installed manually.
 
 Sinks that come with dml:
- * debug: usefull for introspection if something goes wrong or when writing a
+ * debug: useful for introspection if something goes wrong or when writing a
    new sink
  * dml: transforms the dml into another dml. Yeah. Really.
- * html: outputs a valid xhtml file to be
+ * html: outputs a valid xhtml file
  * latex: writes a nice latex file for further processing
  * pdf: native pdf output, see e.g. LaTeX2pdf for a postprocessor outputting
    pretty pdfs
@@ -138,11 +138,13 @@ How all of this will eventually be displayed is up to the backend.
 
 Functions
 ---------
+
 At any time you might write a function, starting with '@', followerd by a
-function name and then a function block delimited by '{' and '}'. Here's
+function name and then a function block delimited by '{' and '}'. They are not
+really functions, because dml isn't a programming language, but anyways: Here's
 what they do:
 
- -- meta:
+meta:
 Used to declare metadata in key/value pairs. Only useful in the header of
 the dml file. For example:
 
@@ -150,13 +152,13 @@ the dml file. For example:
 table_of_contents: True
 }
 
- -- include:
+include:
 Include the contents of another dml-file in your play. Example:
 
 @include{ a_part_of_a_play.dml }
 
-The file to be included must be in the directory of the parent file or in
-your working (current) directory.
+The file to be included must be in the directory of the parent file or in your
+working (current) directory.
 
 
 Syntax in BNF
