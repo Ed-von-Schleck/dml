@@ -10,6 +10,7 @@ Before 0.1 Release Attempt:
  * write installation instructions
  * doublecheck MANUAL
  * get an online presence for users (for devs github is enough)
+ * make HTML-sink to be able to release just the body (no boilertplate)
  
 Possibly After 0.1 Release, But Then As Fast As Possible:
  * write docs for developers, esp. some nice state machine graphs
@@ -17,6 +18,13 @@ Possibly After 0.1 Release, But Then As Fast As Possible:
  * and I mean for each stable release
  * write man page
  * add syntax highligher to gedit/kile/...
+ * write a lilypond function
+ * write some image functions
+
+Nice To Haves, But Check First If It Really Makes Sense:
+ * Unix pipe ouput of sinks (but how with multiple sinks?)
+ * stdout output on sinks (see above)
+ * moev sinks to own threads/processes (what with postprocessors?)
  
 Higher Goals:
  * get into official Fedora (Ubuntu, SuSE, Debian) repository
