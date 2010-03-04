@@ -3,21 +3,24 @@ There is still a lot to do:
 To Make It Fully Work:
  * add postprocessor logic
  * add i18n
+ * add TOC-logic to HTML sink
 
 Before 0.1 Release Attempt:
  * make unittests cover 100%
  * make distutils egg
  * write installation instructions
- * doublecheck MANUAL
  * get an online presence for users (for devs github is enough)
  * make HTML-sink to be able to release just the body (no boilertplate)
+ * write pdf sink
+ * write latex sink
+ * write latex2pdf postprocessor
+ * doublecheck MANUAL
  
 Possibly After 0.1 Release, But Then As Fast As Possible:
  * write docs for developers, esp. some nice state machine graphs
  * make rpm, deb, and a windows installer
  * and I mean for each stable release
  * write man page
- * add syntax highligher to gedit/kile/...
  * write a lilypond function
  * write some image functions
 
@@ -28,6 +31,7 @@ Nice To Haves, But Check First If It Really Makes Sense:
  
 Higher Goals:
  * get into official Fedora (Ubuntu, SuSE, Debian) repository
+ * add syntax highligher to gedit/kile/...
  * write a gedit extension
  * and emacs support
  * and other IDE integration
@@ -41,5 +45,6 @@ Always Good:
  * code cleanups
  * check if docs are still up-to-date
  
-There is a lot to do, even for non-coders. If you want to help, please write to:
+There is something for everyone here, even for non-coders. If you want to help,
+please write to:
 Christian Schramm <christian.h.m.schramm@gmail.com>

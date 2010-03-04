@@ -36,25 +36,38 @@ file named 'my_funny_play.html' in this directory will be overwritten.
 Backends
 --------
 
-There are two kinds of backends: sinks and postprocessors.
+There are two kinds of backends: sinks and postprocessors. It's not too
+difficult to write new backends; please consult the developers documentation if
+you inted to do so.
 
 Sinks directly feed off the parser (they are called sinks because it's a
 streaming parser, and every event generated in the parser will eventually land
 there, but they themselves don't generate or forward any event. They are the
-end of the event food chain). They are usually implemented without third party
-tools.
+end of the event food chain). They don't require third party tools to be
+installed manually.
+
+Sinks that come with dml:
+ * debug: usefull for introspection if something goes wrong or when writing a
+   new sink
+ * dml: transforms the dml into another dml. Yeah. Really.
+ * html: outputs a valid xhtml file to be
+ * latex: writes a nice latex file for further processing
+ * pdf: native pdf output, see e.g. LaTeX2pdf for a postprocessor outputting
+   pretty pdfs
 
 Postprocessors don't recieve any events from anything at all, they rely on
-a sink to already having done the dirty work. They just transform the output of
-a sink into something else (usually a pdf). So you might have a LaTeX sink and
-a LaTeX2pdf postprocessor, or a html sink and a html2pdf postprocessor. Post-
+a sink to have done the dirty work. They just transform the output of a sink
+into something else (usually a pdf). So you might have a LaTeX sink and a
+LaTeX2pdf postprocessor, or a html sink and a html2pdf postprocessor. Post-
 processors usually have a '2' in their name to indicate where they get their
 source from. If a postprocessor is selected, it will automatically activate
 it's corresponding sink, whether you selected it or not. Postprocessors usually
-require a third party tool (like LaTeX or pisa). These tools may not be
+require a third party tool (like LaTeX). These tools may not be
 automatically installed if you install dml. Refer to the READMEs in the 
 'postprocessors' folder for installation help.
 
+Postprocessors that come with dml:
+ * latex2pdf: like it says. Takes latex and boom! - pdf. Magic. Pure magic.
 
 dml Syntax
 ==========
