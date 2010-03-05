@@ -41,7 +41,7 @@ def parser_entry(broadcaster):
                         token = (yield)
                         if token != "\n":
                             break
-                if token == "-":   # This delimits key (actor or tag or sth.).
+                if token == "*":   # This delimits key (actor or tag or sth.).
                     with parser_manager(key, broadcaster) as key_parser:
                         while True:
                             key_parser((yield))    # The key parser return for token ':'.
@@ -55,7 +55,7 @@ def parser_entry(broadcaster):
                                                             # it must be a new block
                     send((events.DATA, constants.TOKEN, token))
                         
-            elif token == "-" in token:
+            elif token == "*" in token:
                 with parser_manager(key, broadcaster) as key_parser:
                     while True:
                         key_parser((yield))
@@ -80,12 +80,6 @@ def parser_entry(broadcaster):
             
         elif token == ">":
             send((events.INLINE_DIR_END, None, None))
-        
-        #elif token in " \n":
-        #    continue
-            # For some reason, sometimes whitespaces appears here.
-            # I suspect some kind of prefetching in the generator
-            # or a programming bug, who knows ...
         
         else:
             send((events.DATA, constants.TOKEN, token))

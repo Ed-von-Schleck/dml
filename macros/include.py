@@ -9,7 +9,7 @@ from src.dmlexceptions import DMLError
 import src.constants as constants
 import src.events as events
 
-def macro(broadcaster, metadata, buffer, push, source):
+def macro(broadcaster, metadata, buffer, lexer):
     try:
         buffer.remove("\n")
     except ValueError:
@@ -24,9 +24,8 @@ def macro(broadcaster, metadata, buffer, push, source):
         raise DMLIncludeIOError(token,
             join(metadata["working_dir"], metadata["filepath"], tonameken),
             join(metadata["working_dir"], name))
-            
-    print(full_filename)
-    source(open(full_filename), full_filename)
+    
+    lexer.push_source(open(full_filename), full_filename)
 
 
 class DMLIncludeSyntaxError(DMLError):

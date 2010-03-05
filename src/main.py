@@ -11,6 +11,7 @@ from src.broadcast import broadcast
 from src.parser import parser_entry
 import src.constants as constants
 import src.events as events
+from src.lex import DmlLex
 
 class NullDevice():
     def write(self, dummy_out):
@@ -37,13 +38,28 @@ def main(dml_file, options=None):
                 broadcaster.send((events.CMD_LINE_OPTION, constants.OUTPUT, mod.NAME))
 
     try:
-        with open(dml_file) as dml:
+        try:
+            dml = open(dml_file, 'r')
             print("opening", dml_file, "...")
-            tokenizer = Tokenizer(dml)
-            tokenizer.run(broadcaster, metadata)
-        print("closed", dml_file)
+            lexer = DmlLex(dml, filename=dml_file)
+        
+            lexer.run(broadcaster, metadata)
+            #tokenizer = Tokenizer(dml)
+            #tokenizer.run(broadcaster, metadata)
+        except IOError:
+            pass
+        finally:
+            dml.close()
+            print("closed", dml_file)
     except DMLError as dml_error:
         import linecache
-        print(linecache.getline(dml_file, tokenizer.line_number))
-        print("Error in line", tokenizer.line_number, ":", dml_error)
+        print ("*" * 80)
+        print("A", dml_error.__class__.__name__, "was encountered:")
+        print(dml_error)
+        print("\tfile:  ", lexer.filename)
+        print("\tline:  ", lexer.lineno)
+        print("\tcolumn:", lexer.pos)
+        print(linecache.getline(lexer.filename, lexer.lineno), end="")
+        print(" " * (lexer.pos - 1) + "^")
+        print ("*" * 80)
         sys.exit(1)

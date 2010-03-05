@@ -7,6 +7,8 @@ Usage
 If you type 'dml --help' on the command line, you should see something like
 that:
 
+<pre>
+
 Usage: dml [options] FILE
 
 Options:
@@ -15,6 +17,8 @@ Options:
   -d, --dml    generates DML output
   -b, --debug  generates debug output
   -q, --quiet  don't print status messages to stdout
+
+</pre>
 
 FILE must be a valid dml-file. The next section describes the syntax of it. If
 that file does not exist, dml with print an Error and exit.
@@ -47,12 +51,12 @@ end of the event food chain). They don't require third party tools to be
 installed manually.
 
 Sinks that come with dml:
- * debug: useful for introspection if something goes wrong or when writing a
+- debug: useful for introspection if something goes wrong or when writing a
    new sink
- * dml: transforms the dml into another dml. Yeah. Really.
- * html: outputs a valid xhtml file
- * latex: writes a nice latex file for further processing
- * pdf: native pdf output, see e.g. LaTeX2pdf for a postprocessor outputting
+- dml: transforms the dml into another dml. Yeah. Really.
+- html: outputs a valid xhtml file
+- latex: writes a nice latex file for further processing
+- pdf: native pdf output, see e.g. LaTeX2pdf for a postprocessor outputting
    pretty pdfs
 
 Postprocessors don't recieve any events from anything at all, they rely on
@@ -67,7 +71,7 @@ automatically installed if you install dml. Refer to the READMEs in the
 'postprocessors' folder for installation help.
 
 Postprocessors that come with dml:
- * latex2pdf: like it says. Takes latex and boom! - pdf. Magic. Pure magic.
+- latex2pdf: like it says. Takes latex and boom! - pdf. Magic. Pure magic.
 
 dml Syntax
 ==========
@@ -82,56 +86,68 @@ The dml is structured like a play usually is: First comes a title, then maybe a
 text block for subtitle or abstract, then a number of informations like author,
 date etc. The syntax for that is easy, like that:
 
+<pre>
+
 = My Funny Play =
 
 it's so funny
 
-- author: me
-- date: 03/04/2010
-    
+* author: me
+* date: 03/04/2010
+
+</pre>
+
 OK, that's:
- * title separated with '='
- * title, block and tag/value pairs separated by two newlines
- * tag/value lines start with a '-'
- * a tag/value line needs a tag and a ':', but not necessarily a value
- * a tag/value line doesnt't actually have to be a line: it can have linebreaks,
+- title separated with '='
+- title, block and tag/value pairs separated by two newlines
+- tag/value lines start with a '-'
+- a tag/value line needs a tag and a ':', but not necessarily a value
+- a tag/value line doesnt't actually have to be a line: it can have linebreaks,
    but not twoe linebreaks (see above)
 The indentation can either be tab or whitespace.
 
 Next may come the cast of the play. It may look like that:
 
+<pre>
+
 == Persons Involved ==
 
-- me: the funny author
-- you: the bored reader
-- the open source community:
+* me: the funny author
+* you: the bored reader
+* the open source community:
+
+</pre>
 
 En detail:
- * cast title separated with '=='
- * title, block and actor declaration/definition pairs separated by two newlines
- * declaration/definition start with a '-'
+- cast title separated with '=='
+- title, block and actor declaration/definition pairs separated by two newlines
+- declaration/definition start with a '-'
 etc.
 Sounds familiar? Yes, the syntax is the same, it just means something different.
 
 OK, a play needs some content, starting with an act title. Lo and behold:
 
+<pre>
+
 === ACT I ===
 
 it was a dark and stormy night.
 
-- me: see? <smiles and waves> It's easy!
-- you: OK ...
+* me: see? <smiles and waves> It's easy!
+* you: OK ...
     
 === ACT II ===
 
-- you: I'm gonna go. Now. <off>
+* you: I'm gonna go. Now. <off>
 
 The author stands alone on the stage.
 
-- me: Well then ... \\
+* me: Well then ... \\
 good bye!
-- the open source community: <is not very interested>
-    
+* the open source community: <is not very interested>
+
+</pre>
+
 I guess by now you've got the hang of it. The only new things are inline stage
 directions (tehy areenclosed with '<' and '>') and '\\', which forces a
 linebreak, but no block separation. Good for poems and such.

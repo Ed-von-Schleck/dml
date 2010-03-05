@@ -7,24 +7,24 @@ paper_size: A5
 
 or Whatever A Subtitle Might Add In Subtlety
 
-- author: Ed von Schleck
-- date: February 26th, 2010
+* author: Ed von Schleck
+* date: February 26th, 2010
 
 == Cast ==
 
-- Ed: a charmful hero
-- Lara: a princess
-- Bill: the dragon
-- the Spanish Inquisition: # no need for a description, but a : has to appear
+* Ed: a charmful hero
+* Lara: a princess
+* Bill: the dragon
+* the Spanish Inquisition: # no need for a description, but a : has to be there
 
 === ACT I ===
 
 It was a dark and stormy night. Ed sat on his computer and hacked a parser
 for a markup language he had yet to invent. Suddenly he heard a pained scream.
 
-- Ed: <walks to his window> What was that?
+* Ed: <walks to his window> What was that?
 # This is so stupid
-- Ed: For great Justice!
+* Ed: For great Justice!
 
 @include {act_2-1.dml}
 @include {act_2-2.dml}
@@ -33,8 +33,8 @@ for a markup language he had yet to invent. Suddenly he heard a pained scream.
 
 Bill, the dragon lies on the floor, dead.
 
-- Lara: Thank you for rescuing me! It's OK that you took the narrative shortcut
+* Lara: Thank you for rescuing me! It's OK that you took the narrative shortcut
 to fight Bill while everyone was outside downing a few beers.
-- Ed: Yeah, let's go home, I've got a parser to write.
+* Ed: Yeah, let's go home, I've got a parser to write.
 
 drop.
