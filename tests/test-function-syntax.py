@@ -1,4 +1,7 @@
 # -*- coding: utf-8
+
+from __future__ import unicode_literals
+
 from tokenizer import Tokenizer
 from dmlexceptions import DMLSyntaxError
 from nose.tools import raises

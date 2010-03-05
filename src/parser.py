@@ -7,6 +7,7 @@ of other coroutines the entry point delegates the token stream to, and a
 contextmanager for those delegates
 
 """
+from __future__ import unicode_literals
 
 from contextlib import contextmanager
 

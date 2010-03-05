@@ -1,6 +1,8 @@
 # -*- coding: utf-8
 
 from __future__ import print_function
+from __future__ import unicode_literals
+
 from src.dmlexceptions import DMLError
 import src.constants as constants
 import src.events as events

@@ -1,4 +1,7 @@
 # -*- coding: utf-8
+
+from __future__ import unicode_literals
+
 class DMLError(Exception):
     """Base class for exceptions in this module."""
     pass

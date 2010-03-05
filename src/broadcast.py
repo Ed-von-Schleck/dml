@@ -15,6 +15,7 @@ Besides the main loop, this is really the heart of dml. It
 """
 
 from __future__ import print_function
+from __future__ import unicode_literals
 
 from collections import namedtuple
 from tempfile import NamedTemporaryFile

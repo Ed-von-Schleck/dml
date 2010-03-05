@@ -1,5 +1,6 @@
 # -*- coding: utf-8
 from __future__ import print_function
+from __future__ import unicode_literals
 
 import src.constants as constants
 import src.events as events
