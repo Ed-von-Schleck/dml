@@ -22,7 +22,6 @@ from tempfile import NamedTemporaryFile
 from shutil import copyfile, move
 import os.path
 
-import sinks
 import src.states as states
 import src.constants as constants
 import src.events as events
