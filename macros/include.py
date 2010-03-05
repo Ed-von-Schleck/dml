@@ -6,38 +6,40 @@ from src.dmlexceptions import DMLError
 import src.constants as constants
 import src.events as events
 
-def macro(broadcaster, metadata, push, source):
+def macro(broadcaster, metadata, buffer, push, source):
     try:
-        while True:
-            token = (yield)
-            if token in "\n\t\r ":
-                continue
-            if exists(join(metadata["working_dir"], metadata["filepath"], token)):
-                full_filename = join(metadata["working_dir"], metadata["filepath"], token)
-            elif exists(join(metadata["working_dir"], token)):
-                full_filename = join(metadata["working_dir"], token)
-            else:
-                raise DMLIncludeIOError(token,
-                    join(metadata["working_dir"], metadata["filepath"], token),
-                    join(metadata["working_dir"], token))
-            while True:
-                token = (yield)
-    except GeneratorExit:
-        push("\n")
-        source(open(full_filename), full_filename)
+        buffer.remove("\n")
+    except ValueError:
+        pass
+    name = buffer.popleft()
+    
+    if exists(join(metadata["working_dir"], metadata["filepath"], name)):
+        full_filename = join(metadata["working_dir"], metadata["filepath"], name)
+    elif exists(join(metadata["working_dir"], name)):
+        full_filename = join(metadata["working_dir"], name)
+    else:
+        raise DMLIncludeIOError(token,
+            join(metadata["working_dir"], metadata["filepath"], tonameken),
+            join(metadata["working_dir"], name))
+            
+    print(full_filename)
+    source(open(full_filename), full_filename)
+
 
 class DMLIncludeSyntaxError(DMLError):
     """Exception raised if a syntax error in a include macro occurs
 
     Attributes:
-        msg -- message
+    msg -- message
     """
 
 class DMLIncludeIOError(DMLError):
     """Exception raised if the file to be included does not exist
 
     Attributes:
-        msg -- message
+    name -- the filename to be included
+    filepath -- search path one
+    working_dir -- search path two
     """
     def __init__(self, filename, filepath, working_dir):
         self.name = filename

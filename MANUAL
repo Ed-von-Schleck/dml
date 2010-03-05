@@ -72,7 +72,7 @@ Postprocessors that come with dml:
 dml Syntax
 ==========
 
-For a for more scientific explanation, look at the BNF part below.
+For a for more scientific explanation, look at developers documentation.
 
 
 General Syntax
@@ -86,30 +86,31 @@ date etc. The syntax for that is easy, like that:
 
 it's so funny
 
-    author: me
-    date: 03/04/2010
+- author: me
+- date: 03/04/2010
     
 OK, that's:
- * title separated with "="
+ * title separated with '='
  * title, block and tag/value pairs separated by two newlines
- * tag/value lines indented
- * a tag/value line without a ":" will be treated as a tag, not a value
+ * tag/value lines start with a '-'
+ * a tag/value line needs a tag and a ':', but not necessarily a value
+ * a tag/value line doesnt't actually have to be a line: it can have linebreaks,
+   but not twoe linebreaks (see above)
 The indentation can either be tab or whitespace.
 
 Next may come the cast of the play. It may look like that:
 
 == Persons Involved ==
 
-    me: the funny author
-    you: the bored reader
-    the open source community
+- me: the funny author
+- you: the bored reader
+- the open source community:
 
 En detail:
- * cast title separated with "=="
+ * cast title separated with '=='
  * title, block and actor declaration/definition pairs separated by two newlines
- * declaration/definition lines indented
- * a declaration/definition line without a ":" will be treated as a declaration,
-   not a definition
+ * declaration/definition start with a '-'
+etc.
 Sounds familiar? Yes, the syntax is the same, it just means something different.
 
 OK, a play needs some content, starting with an act title. Lo and behold:
@@ -118,20 +119,22 @@ OK, a play needs some content, starting with an act title. Lo and behold:
 
 it was a dark and stormy night.
 
-    me: see? <smiles and waves> It's easy!
-    you: OK ...
+- me: see? <smiles and waves> It's easy!
+- you: OK ...
     
 === ACT II ===
 
-    you: I'm gonna go. Now. <off>
+- you: I'm gonna go. Now. <off>
 
 The author stands alone on the stage.
 
-    me: Well then ... good bye!
-    the open source community: <is not very interested>
+- me: Well then ... \\
+good bye!
+- the open source community: <is not very interested>
     
-OK, I guess it's clear what it means. The only new thing are inline stage
-direction enclosed with '<' and '>'.
+I guess by now you've got the hang of it. The only new things are inline stage
+directions (tehy areenclosed with '<' and '>') and '\\', which forces a
+linebreak, but no block separation. Good for poems and such.
 
 How all of this will eventually be displayed is up to the backend.
 
@@ -140,19 +143,18 @@ Macros
 ---------
 
 At any time you might write a macro, starting with '@', followerd by a
-macro name and then a macro block delimited by '{' and '}'. They are not
-really macros, because dml isn't a programming language, but anyways: Here's
-what they do:
+macro name and then a block delimited by '{' and '}'. Here's what they do:
 
-meta:
+#### meta ####
 Used to declare metadata in key/value pairs. Only useful in the header of
 the dml file. For example:
 
 @meta {
 table_of_contents: True
+paper_size: A5
 }
 
-include:
+#### include ####
 Include the contents of another dml-file in your play. Example:
 
 @include{ a_part_of_a_play.dml }
@@ -161,28 +163,4 @@ The file to be included must be in the directory of the parent file or in your
 working (current) directory.
 
 
-Syntax in BNF
--------------
-
-My BNF foo is getting a bit rusty, please report any error you see here. I expect
-pretty obvios one. This is the syntax as I believe it to be:
-
-DML             ::= MACRO | TITLE | CAST | ACT | BLOCK | LINE | KEY | VALUE
-MACRO           ::= "@" WORD "{" MACRO_BODY "}"
-TITLE           ::= NEWLINE+ "=" WORD* "="
-CAST            ::= NEWLINE+ "==" WORD* "=="
-ACT             ::= NEWLINE+ "===" WORD* "==="
-BLOCK           ::= NEW_PARAGRAPH ( WORD | NEWLINE WORD)*
-LINE            ::= NEWLINE KEY VALUE
-KEY             ::= ( WHITESPACE | TAB ) WORD* ( ":" | NEWLINE)
-VALUE           ::= WORD ( WORD | NEWLINE WORD)*
-NEW_PARAGRAPH   ::= NEWLINE NEWLINE+
-NEWLINE         ::= "\n"
-WHITESPACE      ::= " "
-TAB             ::= "\n"
-WORD            ::= <letters, numbers, stuff like that>
-MACRO_BODY   ::= <that's up to the macro>
-
-Please note that my lexer ignores whitespace and tabs except after newlines,
-so the BNF up there is neither entirely correct, nor is it actually used to
-implement the parser.
+***

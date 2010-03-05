@@ -3,6 +3,12 @@ from src.dmlexceptions import DMLError
 import src.constants as constants
 import src.events as events
 
+def macro(broadcaster, metadata, buffer, push, source):
+    KEY, VALUES = 0, 1
+    pointer = KEY
+    for token in buffer:
+        print(token)
+"""
 def macro(broadcaster, metadata, push, source):
     key = ""
     values = []
@@ -45,7 +51,7 @@ def macro(broadcaster, metadata, push, source):
             raise DMLMetaSyntaxError("no key or value(s) defined")
         for value in values:
             broadcaster.send((switch[key][0], switch[key][1], value))
-
+"""
 
 class DMLMetaSyntaxError(DMLError):
     """Exception raised if a syntax error in a meta macro occurs

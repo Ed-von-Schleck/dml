@@ -14,7 +14,7 @@ import src.events as events
 import macros
 from src.dmlexceptions import DMLSyntaxError, DMLMacroNameError
 
-def parser_entry(broadcaster, metadata, push, source, get_next_whitespace, ignore_next_newline):
+def parser_entry(broadcaster):
     """
     the entry point for the dml-parser
 
@@ -28,31 +28,23 @@ def parser_entry(broadcaster, metadata, push, source, get_next_whitespace, ignor
     
     while True:
         token = (yield)
-        if token == "@":    # This checks for macros.
-            with parser_manager(dispatch, broadcaster, metadata, push, source) as macro_dispatch:
-                while True:
-                    macro_dispatch((yield)) # the macro dispatcher returns on token '}'.
                     
-        elif token == "\n":     # On the first newline don't send any special events.
-            get_next_whitespace()   # Whitespace and tabs are key delimiters.
+        if token == "\n":     # On the first newline don't send any special events.
             token = (yield)
             if token == "\n":   # The second newline indicates a new paragraph.
                 send((events.NEW_PARAGRAPH, None, None))
-                get_next_whitespace()
-                ignore_next_newline()   # Ignores more than two newlines.
                 token = (yield)
-                if token == "\t" or " " in token:   # This delimits key (actor or tag or sth.).
-                    with parser_manager(key, broadcaster, push) as key_parser:
+                if token == "\n":
+                    while True:
+                        token = (yield)
+                        if token != "\n":
+                            break
+                if token == "-":   # This delimits key (actor or tag or sth.).
+                    with parser_manager(key, broadcaster) as key_parser:
                         while True:
                             key_parser((yield))    # The key parser return for token ':'.
-                            
-                elif token == "@":
-                    with parser_manager(dispatch, broadcaster, metadata, push, source) as macro_dispatch:
-                        while True:
-                            macro_dispatch((yield))
-
                 elif token == "=":  # This is a title, cast or act.
-                    with parser_manager(title_cast_or_act, broadcaster, push) as tca:
+                    with parser_manager(title_cast_or_act, broadcaster) as tca:
                         while True:
                             tca((yield))   # It will return when the same number of '=' is seen
                                                 # twice with data in-between
@@ -60,19 +52,14 @@ def parser_entry(broadcaster, metadata, push, source, get_next_whitespace, ignor
                     send((events.BLOCK_START, None, None))  # If it's no macro, key or title, cast or act,
                                                             # it must be a new block
                     send((events.DATA, constants.TOKEN, token))
-            
-            elif token == "@":
-                with parser_manager(dispatch, broadcaster, metadata, push, source) as macro_dispatch:
-                    while True:
-                        macro_dispatch((yield))
                         
-            elif token == "\t" or " " in token:
-                with parser_manager(key, broadcaster, push) as key_parser:
+            elif token == "-" in token:
+                with parser_manager(key, broadcaster) as key_parser:
                     while True:
                         key_parser((yield))
                         
             elif token == "=":
-                with parser_manager(title_cast_or_act, broadcaster, push) as tca:
+                with parser_manager(title_cast_or_act, broadcaster) as tca:
                     while True:
                         tca((yield))
             else:
@@ -92,49 +79,16 @@ def parser_entry(broadcaster, metadata, push, source, get_next_whitespace, ignor
         elif token == ">":
             send((events.INLINE_DIR_END, None, None))
         
-        elif token == " ":
-            continue
+        #elif token in " \n":
+        #    continue
             # For some reason, sometimes whitespaces appears here.
             # I suspect some kind of prefetching in the generator
             # or a programming bug, who knows ...
         
         else:
             send((events.DATA, constants.TOKEN, token))
-            
-def dispatch(broadcaster, metadata, push, source):
-    """
-    macro dispatcher
-    
-    The macro dispatcher gets control when a '@' is encountered. It then
-    checks if named macro exists and sends the tokens to it until a '}'
-    is seen. Note that this behaviour (caller stays in control for exiting
-    from the token stream) is different from the rest of the parsing crew,
-    because it wants to make sure a macro always returns.
-    """
-    func_name = (yield)
-    try:
-        if func_name not in macros.__all__:
-            raise DMLMacroNameError(func_name)
-        open_brackets = (yield)
-        if open_brackets != "{":
-            raise DMLSyntaxError(open_brackets, "{")
-        with parser_manager(macros.__dict__[func_name].macro, broadcaster, metadata, push, source) as func:
-            try:
-                while True:
-                    token = (yield)
-                    if token == "}":
-                        break
-                    func(token)
-            except StopIteration:   # if the macro return early, make sure
-                while True:         # not to send any tokens from the macro
-                    token = (yield) # body or '}'
-                    if token == "}":
-                        break                    
-    except GeneratorExit:
-        pass
 
-
-def title_cast_or_act(broadcaster, push):
+def title_cast_or_act(broadcaster):
     """
     parses a title, cast or act declaration
     
@@ -187,22 +141,18 @@ def title_cast_or_act(broadcaster, push):
                     else:
                         raise DMLSyntaxError(token, "==")
 
-def key(broadcaster, push):
+def key(broadcaster):
     """
     key parser
     
-    This little critter gets called when a whitespace or a tab is seen. It
-    sends data until a ':' or a newline is encountered
+    This little critter gets called when a '-' is seen. It sends data until
+    a ':' is encountered
     """
     broadcaster.send((events.KEY_START, None, None))
     while True:
         token = (yield)
         if token == ":":
             broadcaster.send((events.KEY_END, None, None))
-            break
-        if token == "\n":
-            broadcaster.send((events.KEY_END, None, None))
-            push("\n")
             break
         broadcaster.send((events.DATA, constants.TOKEN, token))
         

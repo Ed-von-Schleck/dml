@@ -29,8 +29,8 @@ def sink(metadata, file_obj):
             state, event, key, value = (yield)
             state_name = states.names[state]
             event_name = events.names[event]
-            key_name = "-" if key == None else constants.names[key]
-            value_name = "-" if value == None else value
+            key_name = "-" if key is None else constants.names[key]
+            value_name = "-" if value is None else "'" + value + "'"
             out = "{0:19}| {1:19}| {2:19}| {3:18}\n".format(state_name, event_name, key_name, value_name)
             if count == 40:
                 write(header)

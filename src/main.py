@@ -38,7 +38,7 @@ def main(dml_file, options=None):
         with open(dml_file) as dml:
             print("opening", dml_file, "...")
             tokenizer = Tokenizer(dml)
-            tokenizer.run(broadcaster, parser_entry, metadata)
+            tokenizer.run(broadcaster, metadata)
         print("closed", dml_file)
     except DMLError as dml_error:
         import linecache
