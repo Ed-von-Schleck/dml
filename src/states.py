@@ -4,7 +4,7 @@ from __future__ import unicode_literals
 
 import src.constants as constants
 import src.events as events
-from src.dmlexceptions import DMLError
+from src.dmlexceptions import DMLStateTransitionError
 
 START, HEAD, TITLE, TITLE_BODY, TITLE_BLOCK, CAST, CAST_BODY, CAST_BLOCK, ACT, BODY, BLOCK, ACTOR, DIALOG, TITLE_TAG, TITLE_VALUE, ACTOR_DEC, ACTOR_DES, INLINE_DIR, END = range(19)
 names = "Start", "Head", "Title", "Title Body", "Title Block", "Cast", "Cast Body", "Cast Block", "Act", "Body", "Block", "Actor", "Dialog", "Title Tag", "Title Value", "Actor Declaration", "Actor Description", "Stage Dir.", "End"
@@ -104,17 +104,3 @@ def state_tracker():
             state = transitions[(state, event)]
         except KeyError:
             raise DMLStateTransitionError(state, event)
-        
-class DMLStateTransitionError(DMLError):
-    """Exception raised if an event was sent that doesn't match with a valid transition
-
-    Attributes:
-        state -- starting state
-        event -- invalid event
-    """
-    def __init__(self, state, event):
-        self.state = state
-        self.event = event
-    
-    def __str__(self):
-        return "event '{0}' is not valid in state '{1}'".format(events.names[self.event], names[self.state])

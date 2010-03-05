@@ -42,3 +42,9 @@ class DMLMetaSyntaxError(DMLError):
     Attributes:
         msg -- message
     """
+    def __init__(self, msg):
+        self.error_name = "meta macro Error"
+        self.msg = msg
+        
+    def __str__(self):
+        return self.msg

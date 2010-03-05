@@ -170,6 +170,10 @@ table_of_contents: True
 paper_size: A5
 }
 
+Options may be separated by newlines or ';'
+
+#TODO: list options
+
 #### include ####
 Include the contents of another dml-file in your play. Example:
 
@@ -180,3 +184,6 @@ working (current) directory.
 
 
 ***
+
+If you notice any errors in this document, please file a bug:
+http://github.com/Ed-von-Schleck/dml/issues

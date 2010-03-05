@@ -34,6 +34,14 @@ class DMLIncludeSyntaxError(DMLError):
     Attributes:
     msg -- message
     """
+    def __init__(self, filename, filepath, working_dir):
+        self.error_name = "include syntax error"
+        self.name = filename
+        self.filepath = filepath
+        self.working_dir = working_dir
+        
+    def __str__(self):
+        return "file '{0}' was not found (looked in '{1}' and '{2}')".format(self.name, self.filepath, self.working_dir)
 
 class DMLIncludeIOError(DMLError):
     """Exception raised if the file to be included does not exist
@@ -44,6 +52,7 @@ class DMLIncludeIOError(DMLError):
     working_dir -- search path two
     """
     def __init__(self, filename, filepath, working_dir):
+        self.error_name = "include IO error"
         self.name = filename
         self.filepath = filepath
         self.working_dir = working_dir

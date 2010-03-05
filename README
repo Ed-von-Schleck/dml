@@ -1,4 +1,4 @@
-dml (drama markup language) defines a very readable language to write
+dml (drama markup language) defines a human-readable markup language to write
 theatrical plays, as well as ways to convert it to many other formats, like
 html, latex or pdf.
 

@@ -1,10 +1,7 @@
-There is still a lot to do:
-
 To Make It Fully Work:
  * add postprocessor logic
  * add i18n
  * add TOC-logic to HTML sink
- * make error reporting work with included files
 
 Before 0.1 Release Attempt:
  * make unittests cover 100%

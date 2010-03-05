@@ -27,7 +27,7 @@ import src.states as states
 import src.constants as constants
 import src.events as events
 
-def broadcast(metadata):
+def broadcast(metadata, mysinks):
     """
     the broadcast coroutine
     
@@ -40,33 +40,13 @@ def broadcast(metadata):
     sends:
     state, event, key, name
     """
-    MySink = namedtuple("MySink", "mod cor filters tmpfile closed")
-    mysinks = []
-
     state_machine = states.state_tracker()
     state = state_machine.next()
     sms = state_machine.send
     try:
         while True:
-            if state == states.START:   # This is a message for the broadcaster
-                event, key, value = (yield)
-                state = sms(event)
-                if event == events.CMD_LINE_OPTION and key == constants.OUTPUT:
-                    mod = sinks.__dict__[value]
-                    tmpfile = NamedTemporaryFile(mode="w", delete=False)
-                    cor = mod.sink(metadata, tmpfile)
-                    cor.next()
-                    number_of_filters = len(mod.filters)
-                    myfilters = []
-                    for i in range(number_of_filters):
-                        target = cor if i + 1 >= number_of_filters else mod.filters[i + 1]
-                        myfilter = mod.filters[i](target, mod.SHORTNAME)
-                        myfilter.next()
-                        myfilters.append(myfilter)
-                    mysinks.append(MySink(mod, cor, myfilters, tmpfile, False))
-            else:
-                break
-        while True:         # Now comes everything after state 'Start'
+            event, key, value = (yield)
+            state = sms(event)
             for sink in mysinks:
                 if sink.closed:
                     continue
@@ -81,8 +61,7 @@ def broadcast(metadata):
                     sink._replace(closed= True)
                     for myfilter in sink.filters:
                         myfilter.close()
-            event, key, value = (yield)
-            state = sms(event)
+            
     except GeneratorExit:
         pass
     finally:

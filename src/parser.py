@@ -30,10 +30,9 @@ def parser_entry(broadcaster):
     
     while True:
         token = (yield)
-                    
-        if token == "\n":     # On the first newline don't send any special events.
+        if token == "\n":                   # On the first newline don't send any special events.
             token = (yield)
-            if token == "\n":   # The second newline indicates a new paragraph.
+            if token == "\n":               # The second newline indicates a new paragraph.
                 send((events.NEW_PARAGRAPH, None, None))
                 token = (yield)
                 if token == "\n":
@@ -41,15 +40,15 @@ def parser_entry(broadcaster):
                         token = (yield)
                         if token != "\n":
                             break
-                if token == "*":   # This delimits key (actor or tag or sth.).
+                if token == "*":            # This delimits key (actor or tag or sth.).
                     with parser_manager(key, broadcaster) as key_parser:
                         while True:
                             key_parser((yield))    # The key parser return for token ':'.
-                elif token == "=":  # This is a title, cast or act.
+                elif token == "=":          # This is a title, cast or act.
                     with parser_manager(title_cast_or_act, broadcaster) as tca:
                         while True:
-                            tca((yield))   # It will return when the same number of '=' is seen
-                                                # twice with data in-between
+                            tca((yield))    # It will return when the same number of '=' is seen
+                                            # twice with data in-between
                 else:
                     send((events.BLOCK_START, None, None))  # If it's no macro, key or title, cast or act,
                                                             # it must be a new block
@@ -69,9 +68,9 @@ def parser_entry(broadcaster):
                 
         elif token == "\\":
             token = (yield)
-            if token == "\\":   # '\\' forces a line break.
+            if token == "\\":               # '\\' forces a line break.
                 send((events.DATA, constants.FORCE_NEWLINE, token))
-            else:               # '\' is waved through.
+            else:                           # '\' is waved through.
                 send((events.DATA, constants.TOKEN, "\\"))
                 send((events.DATA, constants.TOKEN, token))
                 

@@ -1,6 +1,6 @@
 # -*- coding: utf-8
 """
-a lexer that is unicode-aware, replaces shlex
+a lexer that is unicode-aware
 
 The main problem of shlex for dml is that it only accepts ascii as wordchars.
 In order to get arbitrary unicode chars work with dml, we have to turn the
