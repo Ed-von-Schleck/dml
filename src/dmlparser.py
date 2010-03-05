@@ -7,14 +7,17 @@ of other coroutines the entry point delegates the token stream to, and a
 contextmanager for those delegates
 
 """
+
 from __future__ import unicode_literals
 
 from contextlib import contextmanager
+from collections import namedtuple
 
 import src.constants as constants
-import src.events as events
-import macros
 from src.dmlexceptions import DMLSyntaxError, DMLMacroNameError
+
+Events = namedtuple("Events", "START CMD_LINE_OPTION MACRO_DATA TITLE_DEL CAST_DEL ACT_DEL DATA KEY_START KEY_END INLINE_DIR_START INLINE_DIR_END NEW_PARAGRAPH BLOCK_START BLOCK_END END")
+events = Events(*xrange(15))
 
 def parser_entry(broadcaster):
     """

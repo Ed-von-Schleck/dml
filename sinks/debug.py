@@ -12,8 +12,8 @@ from __future__ import unicode_literals
 import os.path
 
 import src.constants as constants
-import src.states as states
-import src.events as events
+from src.states import states
+from src.dmlparser import events
 
 NAME = "debug"
 EXTENSION = "dbg"
@@ -29,8 +29,8 @@ def sink(metadata, file_obj):
         write = file_obj.write
         while True:
             state, event, key, value = (yield)
-            state_name = states.names[state]
-            event_name = events.names[event]
+            state_name = states._fields[state]
+            event_name = events._fields[event]
             key_name = "-" if key is None else constants.names[key]
             value_name = "-" if value is None else "'" + value + "'"
             out = "{0:19}| {1:19}| {2:19}| {3:18}\n".format(state_name, event_name, key_name, value_name)

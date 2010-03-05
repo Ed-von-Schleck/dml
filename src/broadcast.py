@@ -17,21 +17,20 @@ Besides the main loop, this is really the heart of dml. It
 from __future__ import print_function
 from __future__ import unicode_literals
 
-from collections import namedtuple
-from tempfile import NamedTemporaryFile
 from shutil import copyfile, move
 import os.path
 
-import src.states as states
+from src.states import states, state_tracker
 import src.constants as constants
-import src.events as events
+from src.dmlparser import events
 
-def broadcast(metadata, mysinks):
+def broadcast(metadata, sinks):
     """
     the broadcast coroutine
     
     Arguments:
     metadata -- metadata about the input file
+    sinks -- the sinks selected at the command line
     
     yields:
     event, key, name
@@ -39,21 +38,23 @@ def broadcast(metadata, mysinks):
     sends:
     state, event, key, name
     """
-    state_machine = states.state_tracker()
+    state_machine = state_tracker()
     state = state_machine.next()
     sms = state_machine.send
     try:
         while True:
             event, key, value = (yield)
             state = sms(event)
-            for sink in mysinks:
+            for sink in sinks:
                 if sink.closed:
                     continue
                 try:
                     if sink.filters:
-                        sink.filters[0].send((state, event, key, value))
+                        send = sink.filters[0].send
                     else:
-                        sink.cor.send((state, event, key, value))
+                        send = sink.cor.send
+                    send((state, event, key, value))
+                
                 # if the sink or any of the filters stops, we stop the whole chain
                 except StopIteration:
                     sink.cor.close()
@@ -64,7 +65,7 @@ def broadcast(metadata, mysinks):
     except GeneratorExit:
         pass
     finally:
-        for sink in mysinks:
+        for sink in sinks:
             tmpfilename = sink.tmpfile.name
             sink.tmpfile.close()
             filename = os.path.join(metadata["working_dir"], metadata["name"] + "." + sink.mod.EXTENSION)

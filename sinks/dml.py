@@ -13,8 +13,8 @@ from __future__ import unicode_literals
 import os.path
 
 import src.constants as constants
-import src.states as states
-import src.events as events
+from src.states import states
+from src.dmlparser import events
 
 NAME = "dml"
 EXTENSION = "dml"

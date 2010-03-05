@@ -7,7 +7,7 @@ from os.path import exists, join
 
 from src.dmlexceptions import DMLError
 import src.constants as constants
-import src.events as events
+from src.dmlparser import events
 
 def macro(broadcaster, metadata, buffer, lexer):
     try:

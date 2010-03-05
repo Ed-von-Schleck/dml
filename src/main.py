@@ -7,12 +7,10 @@ import os, os.path
 from collections import namedtuple
 from tempfile import NamedTemporaryFile
 
-from src.tokenizer import Tokenizer
 from src.dmlexceptions import DMLError
 from src.broadcast import broadcast
-from src.parser import parser_entry
+from src.dmlparser import parser_entry
 import src.constants as constants
-import src.events as events
 from src.lex import DmlLex
 import sinks
 

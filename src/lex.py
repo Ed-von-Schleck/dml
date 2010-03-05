@@ -14,7 +14,7 @@ from __future__ import print_function
 
 from collections import deque, namedtuple
 
-from src.parser import parser_entry, parser_manager
+from src.dmlparser import parser_entry, parser_manager
 import macros
 
 Source = namedtuple("Source", "file_obj filename lineno pos")

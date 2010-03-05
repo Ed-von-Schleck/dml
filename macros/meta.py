@@ -5,7 +5,7 @@ from __future__ import unicode_literals
 
 from src.dmlexceptions import DMLError
 import src.constants as constants
-import src.events as events
+from src.dmlparser import events
 
 def macro(broadcaster, metadata, buffer, lexer):
     KEY, VALUES = 0, 1
@@ -35,7 +35,7 @@ def macro(broadcaster, metadata, buffer, lexer):
                 values = []
             else:
                 broadcaster.send((options[key][0], options[key][1], token))
-
+                
 class DMLMetaSyntaxError(DMLError):
     """Exception raised if a syntax error in a meta macro occurs
 
@@ -48,3 +48,4 @@ class DMLMetaSyntaxError(DMLError):
         
     def __str__(self):
         return self.msg
+

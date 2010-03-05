@@ -1,9 +1,9 @@
 # -*- coding: utf-8
 
 from __future__ import unicode_literals
+from __future__ import print_function
 
-import src.events as events
-import states as states
+#print(dir(dmlparser))
 
 class DMLError(Exception):
     """Base class for exceptions in dml."""
@@ -52,5 +52,4 @@ class DMLStateTransitionError(DMLError):
         self.event = event
     
     def __str__(self):
-        return "event '{0}' is not valid in state '{1}'".format(events.names[self.event], states.names[self.state])
-
+        return "event '{0}' is not valid in state '{1}'".format(self.event, self.state)
