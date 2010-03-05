@@ -1,3 +1,4 @@
+# -*- coding: utf-8
 """
 a sink for debugging
 

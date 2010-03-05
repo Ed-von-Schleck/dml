@@ -1,3 +1,4 @@
+# -*- coding: utf-8
 """
 This coroutine gets the events from the parser and sends them, the
 corresponding states, keys, and tokens to all sinks via the requested

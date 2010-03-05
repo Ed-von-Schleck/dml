@@ -1,3 +1,4 @@
+# -*- coding: utf-8
 import macros
 
 def correct_macro_name_test():

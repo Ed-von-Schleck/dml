@@ -1,8 +1,11 @@
+# -*- coding: utf-8
 """
 a lexer
 
-currently unused
+a lexer that is unicode-aware
 """
+
+from __future__ import unicode_literals
 
 def lex(filename):
     with open(filename) as file_obj:

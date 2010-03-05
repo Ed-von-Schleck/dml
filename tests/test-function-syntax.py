@@ -1,3 +1,4 @@
+# -*- coding: utf-8
 from tokenizer import Tokenizer
 from dmlexceptions import DMLSyntaxError
 from nose.tools import raises

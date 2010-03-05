@@ -1,3 +1,4 @@
+# -*- coding: utf-8
 class DMLError(Exception):
     """Base class for exceptions in this module."""
     pass

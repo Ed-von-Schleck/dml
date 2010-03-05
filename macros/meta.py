@@ -1,3 +1,5 @@
+# -*- coding: utf-8
+
 from __future__ import print_function
 from src.dmlexceptions import DMLError
 import src.constants as constants
