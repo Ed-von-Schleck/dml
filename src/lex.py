@@ -27,6 +27,7 @@ class DmlLex(object):
                  whitespace=" \t\r",
                  commentors="#"):
         self._source_stack = deque()
+        self._pushback_stack = deque()
         self._file_obj = file_obj
         self.filename = filename
         self.lineno = 2
@@ -46,7 +47,10 @@ class DmlLex(object):
         self._file_obj, self.filename, self.lineno, self.pos = self._source_stack.popleft()
         
     def push_token(self, token):
-        pass
+        self._pushback_stack.append(token)
+        
+    def pop_token(self):
+        return self._pushback_stack.pop()
 
     def run(self, broadcaster, metadata):
         special_chars = self._special_chars
@@ -54,8 +58,11 @@ class DmlLex(object):
         commentors = self._commentors
         read = self._file_obj.read
         readline = self._file_obj.readline
+        pop_token = self.pop_token
         with parser_manager(preprocessor, broadcaster, metadata, self) as prepro:
             while True:
+                if self._pushback_stack:
+                    prepro(pop_token())
                 current_char = self._file_obj.read(1)
                 self.pos += 1
                 current_token = deque()
@@ -76,7 +83,6 @@ class DmlLex(object):
                             prepro("".join(current_token))
                         break
                     if current_char in commentors:
-                        
                         if current_token:
                             prepro("".join(current_token))
                         self._file_obj.readline()
