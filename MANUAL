@@ -86,67 +86,50 @@ The dml is structured like a play usually is: First comes a title, then maybe a
 text block for subtitle or abstract, then a number of informations like author,
 date etc. The syntax for that is easy, like that:
 
-<pre>
+    = My Funny Play =
 
-= My Funny Play =
+    it's so funny
 
-it's so funny
-
-* author: me
-* date: 03/04/2010
-
-</pre>
+    *author* me
+    *date* 03/04/2010
 
 OK, that's:
-- title separated with '='
+- title enclosed in '='
 - title, block and tag/value pairs separated by two newlines
-- tag/value lines start with a '-'
-- a tag/value line needs a tag and a ':', but not necessarily a value
-- a tag/value line doesnt't actually have to be a line: it can have linebreaks,
-   but not twoe linebreaks (see above)
-The indentation can either be tab or whitespace.
+- the tag in the tag/value line enclosed in '*'
 
 Next may come the cast of the play. It may look like that:
 
-<pre>
+    == Persons Involved ==
 
-== Persons Involved ==
-
-* me: the funny author
-* you: the bored reader
-* the open source community:
-
-</pre>
+    *me* the funny author
+    *you* the bored reader
+    *the open source community*
 
 En detail:
-- cast title separated with '=='
+- cast title enclosed with '=='
 - title, block and actor declaration/definition pairs separated by two newlines
-- declaration/definition start with a '-'
 etc.
 Sounds familiar? Yes, the syntax is the same, it just means something different.
 
 OK, a play needs some content, starting with an act title. Lo and behold:
 
-<pre>
+    === ACT I ===
 
-=== ACT I ===
+    it was a dark and stormy night.
 
-it was a dark and stormy night.
+    *me* see? <smiles and waves> It's easy!
+    *you* OK ...
+        
+    === ACT II ===
 
-* me: see? <smiles and waves> It's easy!
-* you: OK ...
-    
-=== ACT II ===
+    *you* I'm gonna go. Now. <off>
 
-* you: I'm gonna go. Now. <off>
+    The author stands alone on the stage.
 
-The author stands alone on the stage.
-
-* me: Well then ... \\
-good bye!
-* the open source community: <is not very interested>
-
-</pre>
+    *me* Well then ... \\
+    good bye!
+    *the open source community* <is not very interested>
 
 I guess by now you've got the hang of it. The only new things are inline stage
 directions (tehy areenclosed with '<' and '>') and '\\', which forces a

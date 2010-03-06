@@ -23,7 +23,7 @@ class DmlLex(object):
     def __init__(self,
                  file_obj,
                  filename=None,
-                 special_chars="@{}*\n<>:=\\",
+                 special_chars="@{}*\n<>=\\",
                  whitespace=" \t\r",
                  commentors="#"):
         self._source_stack = deque()
@@ -56,9 +56,8 @@ class DmlLex(object):
         special_chars = self._special_chars
         whitespace = self._whitespace
         commentors = self._commentors
-        read = self._file_obj.read
-        readline = self._file_obj.readline
         pop_token = self.pop_token
+        current_token = deque()
         with parser_manager(preprocessor, broadcaster, metadata, self) as prepro:
             while True:
                 if self._pushback_stack:
@@ -66,8 +65,8 @@ class DmlLex(object):
                     break
                 current_char = self._file_obj.read(1)
                 self.pos += 1
-                current_token = deque()
-                while current_char or self._source_stack or self._pushback_stack:
+                current_token.clear()
+                while current_char or self._source_stack:
                     if not current_char:
                         self.pop_source()
                         break
@@ -110,10 +109,11 @@ def preprocessor(broadcaster, metadata, lexer):
     with parser_manager(parser_entry, broadcaster) as entry:
         macronames = macros.__all__
         macrodict = macros.__dict__
+        buffer = deque()
         while True:
             token = (yield)
-            if token == "@":    # This checks for macros.
-                buffer = deque()
+            if token == "@":
+                buffer.clear()
                 while True:
                     token = (yield)
                     if token == "}":

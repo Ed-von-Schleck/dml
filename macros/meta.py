@@ -4,23 +4,19 @@ from __future__ import print_function
 from __future__ import unicode_literals
 
 from src.dmlexceptions import DMLError
-import src.constants as constants
-from src.dmlparser import events
+from src.constants import events
 
 def macro(broadcaster, metadata, buffer, lexer):
     KEY, VALUES = 0, 1
     pointer = KEY
     key = ""
     values = []
-    options = {
-        "table_of_contents": (events.MACRO_DATA, constants.TOC),
-        "paper_size": (events.MACRO_DATA, constants.PAPER_SIZE),
-        }
+    data = {}
     for token in buffer:
         if pointer == KEY:
             if token == "\n":
                 pass
-            elif token == ":" or token == "=":
+            elif token == "=":
                 if not key:
                     raise DMLMetaSyntaxError("no key defined")
                 pointer = VALUES
@@ -30,11 +26,13 @@ def macro(broadcaster, metadata, buffer, lexer):
                 key = token.lower()
         else:   # pointer to value
             if token == "\n" or token == ";":
+                data[key] = values
                 pointer = KEY
                 key = ""
                 values = []
             else:
-                broadcaster.send((options[key][0], options[key][1], token))
+                values.append(token)
+    broadcaster.send((events.MACRO_DATA, data))
                 
 class DMLMetaSyntaxError(DMLError):
     """Exception raised if a syntax error in a meta macro occurs

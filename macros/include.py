@@ -6,8 +6,6 @@ from __future__ import unicode_literals
 from os.path import exists, join
 
 from src.dmlexceptions import DMLError
-import src.constants as constants
-from src.dmlparser import events
 
 def macro(broadcaster, metadata, buffer, lexer):
     try:
@@ -16,14 +14,14 @@ def macro(broadcaster, metadata, buffer, lexer):
         pass
     name = buffer.popleft()
     
-    if exists(join(metadata["working_dir"], metadata["filepath"], name)):
-        full_filename = join(metadata["working_dir"], metadata["filepath"], name)
-    elif exists(join(metadata["working_dir"], name)):
-        full_filename = join(metadata["working_dir"], name)
+    if exists(join(metadata.working_dir, metadata.filepath, name)):
+        full_filename = join(metadata.working_dir, metadata.filepath, name)
+    elif exists(join(metadata.working_dir, name)):
+        full_filename = join(metadata.working_dir, name)
     else:
         raise DMLIncludeIOError(token,
-            join(metadata["working_dir"], metadata["filepath"], tonameken),
-            join(metadata["working_dir"], name))
+            join(metadata.working_dir, metadata.filepath, tonameken),
+            join(metadata.working_dir, name))
     
     lexer.push_source(open(full_filename), full_filename)
 

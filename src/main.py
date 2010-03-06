@@ -9,23 +9,22 @@ from tempfile import NamedTemporaryFile
 
 from src.dmlexceptions import DMLError
 from src.broadcast import broadcast
-from src.dmlparser import parser_entry
-import src.constants as constants
 from src.lex import DmlLex
 import sinks
 
 class NullDevice():
+    "Dummy output device if option '-q' is selected"
     def write(self, dummy_out):
         pass
         
 MySink = namedtuple("MySink", "mod cor filters tmpfile closed")
+Metadata = namedtuple("Metadata", "filepath name filename working_dir")
 
 def main(dml_file, options):
     filepath, filename = os.path.split(dml_file)
     name, ext = os.path.splitext(os.path.basename(dml_file))
     del ext
-    metadata = {"filepath": filepath, "name": name, "filename": filename, "working_dir": os.getcwd()}
-    
+    metadata = Metadata(filepath, name, filename, os.getcwd())
     if not options.verbose:
         sys.stdout = NullDevice()
         
@@ -54,10 +53,7 @@ def main(dml_file, options):
             dml = open(dml_file, 'r')
             print("opening", dml_file, "...")
             lexer = DmlLex(dml, filename=dml_file)
-        
             lexer.run(broadcaster, metadata)
-            #tokenizer = Tokenizer(dml)
-            #tokenizer.run(broadcaster, metadata)
         except IOError:
             pass
         finally:

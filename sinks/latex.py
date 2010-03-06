@@ -9,9 +9,7 @@ from __future__ import unicode_literals
 
 import os.path
 
-import src.constants as constants
-from src.states import states
-from src.dmlparser import events
+from src.constants import sink_events as events, states
 
 NAME = "latex"
 EXTENSION = "tex"
@@ -23,51 +21,8 @@ def sink(metadata, file_obj):
     try:
         write = file_obj.write
         while True:
-            state, event, key, value = (yield)
-            
-            if event == events.DATA:
-                if key == constants.TOKEN:
-                    write("".join((value, " ")))
-                elif key == constants.FORCE_NEWLINE:
-                    write("\\\\\n")
-                
-            elif event == events.TITLE_DEL:
-                if state == states.TITLE:
-                    write("\n= ")
-                else:
-                    write("=")
-                
-            elif event == events.CAST_DEL:
-                if state == states.CAST:
-                    write("\n== ")
-                else:
-                    write("==")
-                
-            elif event == events.ACT_DEL:
-                if state == states.ACT:
-                    write("\n=== ")
-                else:
-                    write("===")
-
-            elif event == events.NEW_PARAGRAPH:
-                write("\n")
-                
-            elif event == events.BLOCK_START:
-                write("\n")
-
-            elif event == events.INLINE_DIR_START:
-                write("< ")
-            elif event == events.INLINE_DIR_END:
-                write("> ")
-                
-            elif event == events.KEY_START:
-                write("\n\t")
-            elif event == events.KEY_END:
-                write(": ")
-                
-            elif event == events.END:
-                break
-                
+            state, event, value = (yield)
+    
     except GeneratorExit:
         pass
     finally:

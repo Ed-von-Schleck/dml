@@ -20,9 +20,8 @@ from __future__ import unicode_literals
 from shutil import copyfile, move
 import os.path
 
-from src.states import states, state_tracker
-import src.constants as constants
-from src.dmlparser import events
+from src.states import state_tracker
+from src.constants import events, states, sink_events
 
 def broadcast(metadata, sinks):
     """
@@ -43,7 +42,8 @@ def broadcast(metadata, sinks):
     sms = state_machine.send
     try:
         while True:
-            event, key, value = (yield)
+            event, value = (yield)
+            last_state = state
             state = sms(event)
             for sink in sinks:
                 if sink.closed:
@@ -53,8 +53,16 @@ def broadcast(metadata, sinks):
                         send = sink.filters[0].send
                     else:
                         send = sink.cor.send
-                    send((state, event, key, value))
-                
+                    #send((state, event, key, value))
+                    
+                    if last_state != state:
+                        send((last_state, sink_events.END, None))
+                        send((state, sink_events.START, None))
+                    if event == events.MACRO_DATA:
+                        send((state, sink_events.MACRO_DATA, value))
+                    elif event == events.DATA:
+                        send((state, sink_events.DATA, value))
+                    
                 # if the sink or any of the filters stops, we stop the whole chain
                 except StopIteration:
                     sink.cor.close()
@@ -68,7 +76,7 @@ def broadcast(metadata, sinks):
         for sink in sinks:
             tmpfilename = sink.tmpfile.name
             sink.tmpfile.close()
-            filename = os.path.join(metadata["working_dir"], metadata["name"] + "." + sink.mod.EXTENSION)
+            filename = os.path.join(metadata.working_dir, metadata.name + "." + sink.mod.EXTENSION)
             print("written",filename)
             move(sink.tmpfile.name, filename)
             

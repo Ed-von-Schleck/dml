@@ -4,12 +4,8 @@ from __future__ import unicode_literals
 
 from collections import namedtuple
 
-import src.constants as constants
-from src.dmlparser import events
+from src.constants import events, states
 from src.dmlexceptions import DMLStateTransitionError
-
-States = namedtuple("States", "START HEAD TITLE TITLE_BODY TITLE_BLOCK CAST CAST_BODY CAST_BLOCK ACT BODY BLOCK ACTOR DIALOG TITLE_TAG TITLE_VALUE ACTOR_DEC ACTOR_DES INLINE_DIR END")
-states = States(*xrange(19))
 
 def state_tracker():
     state = states.START
