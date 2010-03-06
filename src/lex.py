@@ -63,10 +63,11 @@ class DmlLex(object):
             while True:
                 if self._pushback_stack:
                     prepro(pop_token())
+                    break
                 current_char = self._file_obj.read(1)
                 self.pos += 1
                 current_token = deque()
-                while current_char or self._source_stack:
+                while current_char or self._source_stack or self._pushback_stack:
                     if not current_char:
                         self.pop_source()
                         break
