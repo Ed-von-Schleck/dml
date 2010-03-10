@@ -13,6 +13,7 @@ class DMLSyntaxError(DMLError):
     """Exception raised for errors in the DML syntax.
 
     Attributes:
+        error_name -- pretty-print error name
         is_expr -- unexpected token
         should_be_expr  -- expected token
     """
@@ -26,9 +27,10 @@ class DMLSyntaxError(DMLError):
         return "unexpected token '{0}', expected '{1}'".format(self.is_expr, self.should_be_expr)
                 
 class DMLMacroNameError(DMLError):
-    """Exception raised if macro names are not defined
+    """Exception raised if macro name is not defined
 
     Attributes:
+        error_name -- pretty-print error name
         name -- undefined macro
     """
 
@@ -39,10 +41,25 @@ class DMLMacroNameError(DMLError):
     def __str__(self):
         return "macro name '{0}' is not defined".format(self.name)
         
+class DMLMacroSyntaxError(DMLError):
+    """Exception raised if macro call is syntactically wrong
+
+    Attributes:
+        error_name -- pretty-print error name
+    """
+
+    def __init__(self, name):
+        self.error_name = "macro syntax error"
+
+        
+    def __str__(self):
+        return "syntax error in macro call"
+        
 class DMLStateTransitionError(DMLError):
     """Exception raised if an event was sent that doesn't match with a valid transition
 
     Attributes:
+        error_name -- pretty-print error name
         state -- starting state
         event -- invalid event
     """

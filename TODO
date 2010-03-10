@@ -2,6 +2,7 @@ To Make It Fully Work:
  * add postprocessor logic
  * add i18n
  * add TOC-logic to HTML sink
+ * make lexer hande character escapes
 
 Before 0.1 Release Attempt:
  * make unittests cover 100%
@@ -13,6 +14,7 @@ Before 0.1 Release Attempt:
  * write latex sink
  * write latex2pdf postprocessor
  * doublecheck MANUAL
+ * make lexer not have 'filename', 'file_obj' but 'metadata'
  
 Possibly After 0.1 Release, But Then As Fast As Possible:
  * write docs for developers, esp. some nice state machine graphs

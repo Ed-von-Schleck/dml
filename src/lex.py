@@ -13,9 +13,11 @@ from __future__ import unicode_literals
 from __future__ import print_function
 
 from collections import deque, namedtuple
+from contextlib import nested
+
 
 from src.dmlparser import parser_entry, parser_manager
-import macros
+from macros import macros
 
 Source = namedtuple("Source", "file_obj filename lineno pos")
 
@@ -23,9 +25,8 @@ class DmlLex(object):
     def __init__(self,
                  file_obj,
                  filename=None,
-                 special_chars="@{}*\n<>=\\",
-                 whitespace=" \t\r",
-                 commentors="#"):
+                 special_chars="*\n<>=\\",
+                 whitespace=" \t\r"):
         self._source_stack = deque()
         self._pushback_stack = deque()
         self._file_obj = file_obj
@@ -34,7 +35,6 @@ class DmlLex(object):
         self.pos = 0
         self._special_chars = special_chars
         self._whitespace = whitespace
-        self._commentors = commentors
         
     def push_source(self, new_file_obj, filename=None):
         self._source_stack.appendleft(Source(self._file_obj, self.filename, self.lineno, self.pos))
@@ -55,13 +55,13 @@ class DmlLex(object):
     def run(self, broadcaster, metadata):
         special_chars = self._special_chars
         whitespace = self._whitespace
-        commentors = self._commentors
         pop_token = self.pop_token
         current_token = deque()
-        with parser_manager(preprocessor, broadcaster, metadata, self) as prepro:
+        with nested(parser_manager(parser_entry, broadcaster),
+                    parser_manager(macro_dispatch, broadcaster, metadata, self)) as (entry, dispatch):
             while True:
                 if self._pushback_stack:
-                    prepro(pop_token())
+                    entry(pop_token())
                     break
                 current_char = self._file_obj.read(1)
                 self.pos += 1
@@ -75,18 +75,24 @@ class DmlLex(object):
                             self.lineno += 1
                             self.pos = 0
                         if current_token:
-                            prepro("".join(current_token))
-                        prepro(current_char)
+                            entry("".join(current_token))
+                        entry(current_char)
                         break
                     if current_char in whitespace:
                         if current_token:
-                            prepro("".join(current_token))
+                            entry("".join(current_token))
                         break
-                    if current_char in commentors:
+                    if current_char == '#':
                         if current_token:
-                            prepro("".join(current_token))
+                            entry("".join(current_token))
                         self._file_obj.readline()
-                        prepro("\n")
+                        entry("\n")
+                        break
+                    if current_char == '@':
+                        if current_token:
+                            entry("".join(current_token))
+                        dispatch(self._file_obj.readline())
+                        entry("\n")
                         break
                     
                     current_token.append(current_char)
@@ -94,38 +100,17 @@ class DmlLex(object):
                     self.pos += 1
                 else:
                     break
-                
-                
-def preprocessor(broadcaster, metadata, lexer):
-    """
-    preprocessing the token stream
-    
-    The preprocessor sorts out macros (beginning with '@') and hands them a
-    deque of tokens in the macro block. They aren't coroutines cause they might
-    want to mess with the token stream. They all get the metadata als well as
-    the lexer object.
-    
-    """
-    with parser_manager(parser_entry, broadcaster) as entry:
-        macronames = macros.__all__
-        macrodict = macros.__dict__
-        buffer = deque()
-        while True:
-            token = (yield)
-            if token == "@":
-                buffer.clear()
-                while True:
-                    token = (yield)
-                    if token == "}":
-                        break
-                    buffer.append(token)
-                name = buffer.popleft()
-                open_brackets = buffer.popleft()
-                if name not in macronames:
-                    raise DMLMacroNameError(name)
-                if open_brackets != "{":
-                    raise DMLSyntaxError(open_brackets, "{")
-                macrodict[name].macro(broadcaster, metadata, buffer, lexer)
-                continue
-            entry(token)            
-        broadcaster.send((events.END, None, None))
+
+
+def macro_dispatch(broadcaster, metadata, lexer):
+    macro_objs = {}
+    for key, macro_cls in macros.items():
+        macro_objs[key] = macro_cls(broadcaster, metadata, lexer)
+    while True:
+        raw = (yield)
+        name, sep, data = raw.partition(" ")
+        if not sep and not data:
+            raise DMLMacroSyntaxError()
+        if name not in macros:
+            raise DMLMacroNameError(name)
+        macro_objs[name].action(data)

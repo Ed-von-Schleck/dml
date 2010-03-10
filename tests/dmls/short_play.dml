@@ -1,7 +1,5 @@
-@meta {
-table_of_contents = true
-paper_size = A5
-}
+@meta table_of_contents: True
+@meta paper_size: A5
 
 = The Short, But Complete Play =
 
@@ -26,8 +24,8 @@ for a markup language he had yet to invent. Suddenly he heard a pained scream.
 # This is so stupid
 *Ed* For great Justice!
 
-@include {act_2-1.dml}
-@include {act_2-2.dml}
+@include act_2-1.dml
+@include act_2-2.dml
 
 === ACT III ===
 

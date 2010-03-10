@@ -5,34 +5,39 @@ from __future__ import unicode_literals
 
 from src.dmlexceptions import DMLError
 from src.constants import events
-
-def macro(broadcaster, metadata, buffer, lexer):
-    KEY, VALUES = 0, 1
-    pointer = KEY
-    key = ""
-    values = []
-    data = {}
-    for token in buffer:
-        if pointer == KEY:
-            if token == "\n":
-                pass
-            elif token == "=":
-                if not key:
-                    raise DMLMetaSyntaxError("no key defined")
-                pointer = VALUES
-            elif key:
-                raise DMLMetaSyntaxError("a key is already defined")
-            else:
-                key = token.lower()
-        else:   # pointer to value
-            if token == "\n" or token == ";":
-                data[key] = values
-                pointer = KEY
-                key = ""
-                values = []
-            else:
-                values.append(token)
-    broadcaster.send((events.MACRO_DATA, data))
+    
+class Meta(object):
+    def __init__(self, broadcaster, metadata, lexer):
+        self.broadcaster = broadcaster
+        #self.metadata = metadata
+        #self.lexer = lexer
+        self.false_strings = ('false', '0', 'off', 'no')
+        self.true_strings = ('true', '1', 'on', 'yes')
+        self.papersizes = ('a4', 'a5', 'letter')
+        
+    def action(self, data):
+        key, sep, value = data.partition(":")
+        if not sep:
+            raise DMLMetaSyntaxError("expected ':' in macro expression")
+        if not value:
+            raise DMLMetaSyntaxError("no value given")
+            
+        value = value.lower().strip()
+        if key == "table_of_contents":
+            if value in self.false_strings:
+                self.broadcaster.send((events.MACRO_DATA, (key, False)))
+                return
+            if value in self.true_strings:
+                self.broadcaster.send((events.MACRO_DATA, (key, True)))
+                return
+            raise DMLMetaSyntaxError("expected bool value ('True' or 'False')")
+        if key == "paper_size":
+            if value in self.papersizes:
+                self.broadcaster.send((events.MACRO_DATA, (key, value)))
+                return
+            raise DMLMetaSyntaxError("expected papersize value ('A5', 'A4', 'letter' and the like)")
+        raise DMLMetaSyntaxError("unknown key")
+        
                 
 class DMLMetaSyntaxError(DMLError):
     """Exception raised if a syntax error in a meta macro occurs

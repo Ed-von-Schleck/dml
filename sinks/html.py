@@ -17,11 +17,27 @@ def sink(metadata, file_obj):
         with open("sinks/html/boilerplate") as boilerplate:
             copyfileobj(boilerplate, file_obj)
         write = file_obj.write
+        state, event, value = (yield)
+        
+        table_of_contents = False
+        
         while True:
+            if state != states.START:
+                break
             state, event, value = (yield)
+        
+        while True:
+            if state != states.HEAD:
+                break
+            if event == events.MACRO_DATA:
+                pass
+            state, event, value = (yield)
+        
+        while True:
             if event == events.DATA:
                 write(value)
                 break
+            state, event, value = (yield)
             #TODO
 
     except GeneratorExit:

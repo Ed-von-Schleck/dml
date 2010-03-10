@@ -38,7 +38,8 @@ def broadcast(metadata, sinks):
     state, event, key, name
     """
     state_machine = state_tracker()
-    state = state_machine.next()
+    state_machine.next()
+    state = states.START
     sms = state_machine.send
     try:
         while True:
