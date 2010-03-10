@@ -29,13 +29,13 @@ def sink(metadata, file_obj):
             state, event, value = (yield)
             state_name = states._fields[state]
             event_name = events._fields[event]
-            value_name = "-" if value is None else "'" + str(value) + "'"
+            value_name = "" if value is None else value
             out = "{0:19}| {1:19}| {2:18}\n".format(state_name, event_name, value_name)
             if count == 40:
                 write(header)
                 count = 0
             count += 1
-            write(out)
+            write(out.encode("utf-8"))
     except GeneratorExit:
         pass
     finally:

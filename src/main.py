@@ -6,6 +6,7 @@ import sys
 import os, os.path
 from collections import namedtuple
 from tempfile import NamedTemporaryFile
+import codecs
 
 from src.dmlexceptions import DMLError
 from src.broadcast import broadcast
@@ -33,7 +34,7 @@ def main(dml_file, options):
     sink_mods = [sinks.__dict__[mod] for mod in sinks.__all__]
     for mod in sink_mods:
         if options.__dict__[mod.NAME]:
-            tmpfile = NamedTemporaryFile(mode="w", delete=False)
+            tmpfile = codecs.EncodedFile(NamedTemporaryFile(mode="w", delete=False), "utf-8")
             cor = mod.sink(metadata, tmpfile)
             cor.next()
             number_of_filters = len(mod.filters)
@@ -50,7 +51,7 @@ def main(dml_file, options):
 
     try:
         try:
-            dml = open(dml_file, 'r')
+            dml = codecs.open(dml_file, "r", "utf-8")
             print("opening", dml_file, "...")
             lexer = DmlLex(dml, filename=dml_file)
             lexer.run(broadcaster, metadata)

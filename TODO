@@ -1,6 +1,5 @@
 To Make It Fully Work:
- * add postprocessor logic
- * add i18n
+ * add postprocessor logic (?)
  * add TOC-logic to HTML sink
  * make lexer hande character escapes
 
@@ -15,13 +14,14 @@ Before 0.1 Release Attempt:
  * write latex2pdf postprocessor
  * doublecheck MANUAL
  * make lexer not have 'filename', 'file_obj' but 'metadata'
+ * write a lilypond macro
  
 Possibly After 0.1 Release, But Then As Fast As Possible:
  * write docs for developers, esp. some nice state machine graphs
+ * the syntax in BNF
  * make rpm, deb, and a windows installer
  * and I mean for each stable release
  * write man page
- * write a lilypond macro
  * write some image macros
 
 Nice To Haves, But Check First If It Really Makes Sense:

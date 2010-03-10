@@ -48,7 +48,7 @@ class DMLMacroSyntaxError(DMLError):
         error_name -- pretty-print error name
     """
 
-    def __init__(self, name):
+    def __init__(self):
         self.error_name = "macro syntax error"
 
         

@@ -44,6 +44,7 @@ def broadcast(metadata, sinks):
     try:
         while True:
             event, value = (yield)
+            #print(value)
             last_state = state
             state = sms(event)
             for sink in sinks:

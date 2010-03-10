@@ -33,6 +33,7 @@ def state_tracker():
         ((states.TITLE_BODY, events.DATA), states.TITLE_BODY),
         ((states.TITLE_BODY, events.CAST_DEL), states.CAST),
         ((states.TITLE_BODY, events.ACT_DEL), states.ACT),
+        ((states.TITLE_BODY, events.SCENE_DEL), states.SCENE),
         ((states.TITLE_BODY, events.BLOCK_START), states.TITLE_BLOCK),
         ((states.TITLE_BODY, events.KEY_START), states.TITLE_TAG),
         
@@ -53,6 +54,7 @@ def state_tracker():
         
         ((states.CAST_BODY, events.DATA), states.CAST_BODY),
         ((states.CAST_BODY, events.ACT_DEL), states.ACT),
+        ((states.CAST_BODY, events.SCENE_DEL), states.SCENE),
         ((states.CAST_BODY, events.NEW_PARAGRAPH), states.CAST_BODY),
         ((states.CAST_BODY, events.BLOCK_START), states.CAST_BLOCK),
         ((states.CAST_BODY, events.KEY_START), states.ACTOR_DEC),
@@ -70,8 +72,12 @@ def state_tracker():
         ((states.ACT, events.DATA), states.ACT),
         ((states.ACT, events.ACT_DEL), states.BODY),
         
+        ((states.SCENE, events.DATA), states.SCENE),
+        ((states.SCENE, events.SCENE_DEL), states.BODY),
+        
         ((states.BODY, events.MACRO_DATA), states.BODY),
         ((states.BODY, events.ACT_DEL), states.ACT),
+        ((states.BODY, events.SCENE_DEL), states.SCENE),
         ((states.BODY, events.NEW_PARAGRAPH), states.BODY),
         ((states.BODY, events.BLOCK_START), states.BLOCK),
         ((states.BODY, events.KEY_START), states.ACTOR),

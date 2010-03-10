@@ -2,9 +2,9 @@
 """
 the parser
 
-Here we got the parser entry point, which the tokenizer sends to, a bunch
-of other coroutines the entry point delegates the token stream to, and a
-contextmanager for those delegates
+Here we got the parser entry point which the lexer sends to, a bunch of other
+coroutines the entry point delegates the token stream to, and a contextmanager
+for those delegates.
 
 """
 
@@ -30,6 +30,7 @@ def parser_entry(broadcaster):
     
     while True:
         token = (yield)
+        
         if token == "\n":                   # On the first newline don't send any special events.
             token = (yield)
             if token == "\n":               # The second newline indicates a new paragraph.
@@ -54,7 +55,7 @@ def parser_entry(broadcaster):
                                                             # it must be a new block
                     send((events.DATA, token))
                         
-            elif token == "*" in token:
+            elif token == "*":
                 with parser_manager(key, broadcaster) as key_parser:
                     while True:
                         key_parser((yield))
@@ -63,6 +64,11 @@ def parser_entry(broadcaster):
                 with parser_manager(title_cast_or_act, broadcaster) as tca:
                     while True:
                         tca((yield))
+            elif token == "<":
+                send((events.INLINE_DIR_START, None))
+                
+            elif token == ">":
+                send((events.INLINE_DIR_END, None))
             else:
                 send((events.DATA, token))
                 
@@ -114,8 +120,7 @@ def title_cast_or_act(broadcaster):
                 if token == "=":
                     send((events.CAST_DEL, None))
                     break
-                else:
-                    raise DMLSyntaxError(token, "=")
+                raise DMLSyntaxError(token, "=")
         else:
             token = (yield)
             if token != "=":
@@ -131,11 +136,28 @@ def title_cast_or_act(broadcaster):
                         if token == "=":
                             send((events.ACT_DEL, None))
                             break
-                        else:
-                            raise DMLSyntaxError(token, "=")
-                    else:
-                        raise DMLSyntaxError(token, "==")
-
+                        raise DMLSyntaxError(token, "=")
+                    raise DMLSyntaxError(token, "==")
+            else:
+                token = (yield)
+                if token != "=":
+                    send((events.SCENE_DEL, None))
+                    while True:
+                        send((events.DATA, token))
+                        token = (yield)
+                        if token != "=":
+                            continue
+                        token = (yield)
+                        if token == "=":
+                            token = (yield)
+                            if token == "=":
+                                token = (yield)
+                                if token == "=":
+                                    send((events.SCENE_DEL, None))
+                                    break
+                                raise DMLSyntaxError(token, "=")
+                            raise DMLSyntaxError(token, "==")
+                        raise DMLSyntaxError(token, "===")
 def key(broadcaster):
     """
     key parser
@@ -156,8 +178,8 @@ def parser_manager(coroutine, *args, **kwargs):
     """
     the parser contextmanager
     
-    This handy little macro initialized a parser coroutine and returns its
-    'send' macro. It also swallows the StopIteration exception.
+    This handy little function initializes a parser coroutine and returns its
+    'send' function. It also swallows the StopIteration exception.
     """
     cor = coroutine(*args, **kwargs)
     cor.next()
