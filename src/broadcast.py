@@ -44,7 +44,6 @@ def broadcast(metadata, sinks):
     try:
         while True:
             event, value = (yield)
-            #print(value)
             last_state = state
             state = sms(event)
             for sink in sinks:
@@ -55,15 +54,14 @@ def broadcast(metadata, sinks):
                         send = sink.filters[0].send
                     else:
                         send = sink.cor.send
-                    #send((state, event, key, value))
-                    
+
                     if last_state != state:
                         send((last_state, sink_events.END, None))
                         send((state, sink_events.START, None))
-                    if event == events.MACRO_DATA:
-                        send((state, sink_events.MACRO_DATA, value))
-                    elif event == events.DATA:
+                    if event == events.DATA:
                         send((state, sink_events.DATA, value))
+                    elif event == events.MACRO_DATA:
+                        send((state, sink_events.MACRO_DATA, value))
                     
                 # if the sink or any of the filters stops, we stop the whole chain
                 except StopIteration:

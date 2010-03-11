@@ -14,7 +14,7 @@ from __future__ import print_function
 
 from collections import deque, namedtuple
 from contextlib import nested
-
+from multiprocessing import Process, Queue
 
 from src.dmlparser import parser_entry, parser_manager
 from macros import macros
@@ -26,7 +26,7 @@ class DmlLex(object):
     def __init__(self,
                  file_obj,
                  filename=None,
-                 special_chars="<*\n>=\\",
+                 special_chars="\n*<>=\\",
                  whitespace=" \t\r"):
         self._source_stack = deque()
         self._file_obj = file_obj
@@ -49,51 +49,55 @@ class DmlLex(object):
     def run(self, broadcaster, metadata):
         special_chars = self._special_chars
         whitespace = self._whitespace
-        current_token = deque()
+        concenate = "".join
+        pos = self.pos
         with nested(parser_manager(parser_entry, broadcaster),
                     parser_manager(macro_dispatch, broadcaster, metadata, self)) as (entry, dispatch):
             while True:
-                current_char = self._file_obj.read(1)
-                self.pos += 1
-                current_token.clear()
+                read = self._file_obj.read  # can be changed by push/pop_source
+                current_char = read(1)
+                pos += 1
+                self.pos = pos              # likewise
+                current_token = []          # faster than deque(), I tested it
+                current_token_append = current_token.append
                 while current_char or self._source_stack:
                     if not current_char:
-                        self.pop_source()
-                        break
-                    if current_char in special_chars:
-                        if current_char == "\n":
-                            self.lineno += 1
-                            self.pos = 0
                         if current_token:
-                            entry("".join(current_token))
-                        entry(current_char)
+                            entry(concenate(current_token))
+                        self.pop_source()
                         break
                     if current_char in whitespace:
                         if current_token:
-                            entry("".join(current_token))
+                            entry(concenate(current_token))
+                        break
+                    if current_char in special_chars:
+                        if current_token:
+                            entry(concenate(current_token))
+                        if current_char == "\n":
+                            self.lineno += 1
+                            pos = 0
+                        entry(current_char)
                         break
                     if current_char == '#':
                         if current_token:
-                            entry("".join(current_token))
+                            entry(concenate(current_token))
                         self._file_obj.readline()
                         self.lineno += 1
                         entry("\n")
                         break
                     if current_char == '@':
                         if current_token:
-                            entry("".join(current_token))
-                        line = self._file_obj.readline()
-                        dispatch(line)
+                            entry(concenate(current_token))
+                        dispatch(self._file_obj.readline())
                         self.lineno += 1
                         entry("\n")
                         break
-                    
-                    current_token.append(current_char)
-                    current_char = self._file_obj.read(1)
-                    self.pos += 1
+
+                    current_token_append(current_char)
+                    current_char = read(1)
+                    pos += 1
                 else:
                     break
-
 
 def macro_dispatch(broadcaster, metadata, lexer):
     macro_objs = {}

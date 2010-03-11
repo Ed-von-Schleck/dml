@@ -36,6 +36,7 @@ def sink(metadata, file_obj):
                 count = 0
             count += 1
             write(out.encode("utf-8"))
+
     except GeneratorExit:
         pass
     finally:
