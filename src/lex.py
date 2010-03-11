@@ -14,15 +14,24 @@ from __future__ import print_function
 
 from collections import deque, namedtuple
 from contextlib import nested
-from multiprocessing import Process, Queue
+from array import array
 
 from src.dmlparser import parser_entry, parser_manager
 from macros import macros
+from src.constants import events
 from src.dmlexceptions import DMLMacroSyntaxError, DMLMacroNameError
 
 Source = namedtuple("Source", "file_obj filename lineno pos")
 
 class DmlLex(object):
+    """
+    the lexer class
+    
+    This is not a drop-in replacement for pythons shlex - it operates in a 
+    different way that is consistent with the rest of dml. It reads the file
+    char by char and then sends tokens to the parser coroutine or whole
+    (unparsed) strings to the macro dispatcher.
+    """
     def __init__(self,
                  file_obj,
                  filename=None,
@@ -53,12 +62,14 @@ class DmlLex(object):
         pos = self.pos
         with nested(parser_manager(parser_entry, broadcaster),
                     parser_manager(macro_dispatch, broadcaster, metadata, self)) as (entry, dispatch):
+            entry("\n")                     # new file is like newline, isn't it?
             while True:
                 read = self._file_obj.read  # can be changed by push/pop_source
                 current_char = read(1)
                 pos += 1
                 self.pos = pos              # likewise
                 current_token = []          # faster than deque(), I tested it
+                #current_token = array(b'u')
                 current_token_append = current_token.append
                 while current_char or self._source_stack:
                     if not current_char:
@@ -73,6 +84,11 @@ class DmlLex(object):
                     if current_char in special_chars:
                         if current_token:
                             entry(concenate(current_token))
+                        if current_char == "\\":     # handle escapes
+                            slash = current_char
+                            current_char = read(1)
+                            if current_char not in "#@":
+                                entry(slash)
                         if current_char == "\n":
                             self.lineno += 1
                             pos = 0
@@ -83,6 +99,7 @@ class DmlLex(object):
                             entry(concenate(current_token))
                         self._file_obj.readline()
                         self.lineno += 1
+                        pos = 0
                         entry("\n")
                         break
                     if current_char == '@':
@@ -90,6 +107,7 @@ class DmlLex(object):
                             entry(concenate(current_token))
                         dispatch(self._file_obj.readline())
                         self.lineno += 1
+                        pos = 0
                         entry("\n")
                         break
 
@@ -97,15 +115,22 @@ class DmlLex(object):
                     current_char = read(1)
                     pos += 1
                 else:
+                    broadcaster.send((events.END, None))
                     break
 
 def macro_dispatch(broadcaster, metadata, lexer):
+    """
+    the macro dispatcher
+    
+    It first makes a list of all available macros. When a string is sent, it
+    resolves the macro name and calls the macro (a function, not a coroutine)
+    with the rest of the string.
+    """
     macro_objs = {}
     for key, macro_cls in macros.items():
         macro_objs[key] = macro_cls(broadcaster, metadata, lexer)
     while True:
         raw = (yield)
-        #print(raw)
         name, sep, data = raw.partition(" ")
         if not sep and not data:
             raise DMLMacroSyntaxError()

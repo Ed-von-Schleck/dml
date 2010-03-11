@@ -11,11 +11,9 @@ for those delegates.
 from __future__ import unicode_literals
 
 from contextlib import contextmanager
-from collections import namedtuple
-from multiprocessing import Process, Queue
 
-from src.constants import events, states
-from src.dmlexceptions import DMLSyntaxError, DMLMacroNameError
+from src.constants import events
+from src.dmlexceptions import DMLSyntaxError
 
 def parser_entry(broadcaster):
     """
@@ -185,7 +183,6 @@ def parser_manager(coroutine, *args, **kwargs):
     cor = coroutine(*args, **kwargs)
     cor.next()
     send = cor.send
-    parse_process = Process(target=send)
     try:
         yield send
     except StopIteration:

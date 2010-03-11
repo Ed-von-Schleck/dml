@@ -114,25 +114,30 @@ Sounds familiar? Yes, the syntax is the same, it just means something different.
 
 OK, a play needs some content, starting with an act title. Lo and behold:
 
-    === ACT I ===
+    === Act I ===
 
     it was a dark and stormy night.
 
     *me* see? <smiles and waves> It's easy!
     *you* OK ...
         
-    === ACT II ===
+    === Act II ===
+    
+    ==== Scene 1 ====
 
     *you* I'm gonna go. Now. <off>
 
+    ==== Scene 2 ====
+    
     The author stands alone on the stage.
-
+    
     *me* Well then ... \\
     good bye!
     *the open source community* <is not very interested>
 
-I guess by now you've got the hang of it. The only new things are inline stage
-directions (tehy areenclosed with '<' and '>') and '\\', which forces a
+I guess by now you've got the hang of it. Act and scene titles are enclosed in
+'===' and '====' respectively. Other notable things are inline stage
+directions (they are enclosed with '<' and '>') and '\\', which forces a
 linebreak, but no block separation. Good for poems and such.
 
 How all of this will eventually be displayed is up to the backend.

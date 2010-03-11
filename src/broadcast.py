@@ -19,9 +19,38 @@ from __future__ import unicode_literals
 
 from shutil import copyfile, move
 import os.path
+from collections import deque
 
 from src.states import state_tracker
 from src.constants import events, states, sink_events
+
+stack = deque()
+
+nested = [ \
+        (states.BODY, states.BLOCK), \
+        (states.TITLE_BODY, states.TITLE_BLOCK), \
+        (states.TITLE_BODY, states.TITLE_TAG), \
+        (states.TITLE_BODY, states.TITLE_VALUE), \
+        (states.BODY, states.ACTOR), \
+        (states.BODY, states.DIALOG), \
+        (states.DIALOG, states.INLINE_DIR), \
+        ]
+
+def state_change(last_state, state, send):
+    if (last_state, state) in nested:
+        stack.append(last_state)
+        send((state, sink_events.START, None))
+    elif stack:
+        send((last_state, sink_events.END, None))
+        pop_state = stack.pop()
+        if pop_state != state:
+            state_change(pop_state, state, send)    # to understand recursion ...
+        else:
+            #stack.append(pop_state)
+            pass
+    else:
+        send((last_state, sink_events.END, None))
+        send((state, sink_events.START, None))
 
 def broadcast(metadata, sinks):
     """
@@ -41,6 +70,7 @@ def broadcast(metadata, sinks):
     state_machine.next()
     state = states.START
     sms = state_machine.send
+    
     try:
         while True:
             event, value = (yield)
@@ -56,8 +86,8 @@ def broadcast(metadata, sinks):
                         send = sink.cor.send
 
                     if last_state != state:
-                        send((last_state, sink_events.END, None))
-                        send((state, sink_events.START, None))
+                        state_change(last_state, state, send)
+                        
                     if event == events.DATA:
                         send((state, sink_events.DATA, value))
                     elif event == events.MACRO_DATA:
@@ -77,6 +107,6 @@ def broadcast(metadata, sinks):
             tmpfilename = sink.tmpfile.name
             sink.tmpfile.close()
             filename = os.path.join(metadata.working_dir, metadata.name + "." + sink.mod.EXTENSION)
-            print("written",filename)
+            print("written", filename)
             move(sink.tmpfile.name, filename)
             

@@ -3,8 +3,6 @@
 from __future__ import unicode_literals
 from __future__ import print_function
 
-#print(dir(dmlparser))
-
 class DMLError(Exception):
     """Base class for exceptions in dml."""
     pass
@@ -51,7 +49,6 @@ class DMLMacroSyntaxError(DMLError):
     def __init__(self):
         self.error_name = "macro syntax error"
 
-        
     def __str__(self):
         return "syntax error in macro call"
         

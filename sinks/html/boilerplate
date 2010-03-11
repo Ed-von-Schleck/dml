@@ -3,7 +3,13 @@
        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/> 
 <style type="text/css">
+
+body {
+    font-family: Century Schoolbook L, serif;
+}
+
 h1#DML_title {
    text-align: center;
    clear: both;
@@ -23,6 +29,15 @@ h3.DML_act {
     padding: 1em;
     margin: 0;
     page-break-before:always;
+    page-break-after: avoid;
+}
+
+h4.DML_scene {
+    text-align: center;
+    clear: both;
+    padding: 1em;
+    margin: 0;
+    page-break-after: avoid;
 }
 
 p.DML_title_value_line {
@@ -65,6 +80,7 @@ p.DML_block {
 }
 
 p.DML_dialog_line {
+    page-break-inside: avoid;
     text-indent: -1em;
     margin: 0;
     padding-left: 1em;
@@ -72,12 +88,11 @@ p.DML_dialog_line {
 }
 
 span.DML_actor {
+    font-weight: bold;
     font-variant: small-caps;
 }
 span.DML_stage_direction {
     font-style: oblique;
 }
 </style>
-<title></title>
-</head>
-<body>
+
