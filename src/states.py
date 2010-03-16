@@ -5,6 +5,7 @@ from __future__ import unicode_literals
 from collections import namedtuple
 
 from src.dmlexceptions import DMLStateTransitionError
+from grammar import states
 
 def state_tracker():
     state = "start"
@@ -104,6 +105,7 @@ def state_tracker():
     while True:
         event = (yield state)
         try:
-            state = transitions[(state, event)]
+            #state = transitions[(state, event)]
+            state = states[state][1][event]
         except KeyError:
             raise DMLStateTransitionError(state, event)

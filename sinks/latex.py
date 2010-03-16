@@ -9,8 +9,6 @@ from __future__ import unicode_literals
 
 import os.path
 
-from src.constants import sink_events as events, states
-
 NAME = "latex"
 EXTENSION = "tex"
 DESCRIPTION = "generates latex output"
