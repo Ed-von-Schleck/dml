@@ -43,13 +43,6 @@ def sink(metadata, file_obj):
                     title.append(value)
                 if event == "end":
                     title_infos["Title"] = " ".join(title)
-            if state == "title":
-                if event == "start":
-                    title = []
-                if event == "data":
-                    title.append(value)
-                if event == "end":
-                    title_infos["Title"] = " ".join(title)
             if event == "macro_data":
                 # TODO
                 continue
