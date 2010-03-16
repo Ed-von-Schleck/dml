@@ -22,20 +22,13 @@ import os.path
 from collections import deque
 
 from src.states import state_tracker
+from src.grammar import states
+from src.dmlexceptions import DMLStateTransitionError
+
 stack = deque()
 
-nested = [ \
-        ("body", "block"), \
-        ("title_body", "title_block"), \
-        ("title_body", "title_tag"), \
-        ("title_body", "title_value"), \
-        ("body", "actor"), \
-        ("body", "dialog"), \
-        ("dialog", "inline_dir"), \
-        ]
-
 def state_change(last_state, state, send):
-    if (last_state, state) in nested:
+    if state in states[last_state][0]:
         stack.append(last_state)
         send((state, "start", None))
     elif stack:
@@ -43,9 +36,6 @@ def state_change(last_state, state, send):
         pop_state = stack.pop()
         if pop_state != state:
             state_change(pop_state, state, send)    # to understand recursion ...
-        else:
-            #stack.append(pop_state)
-            pass
     else:
         send((last_state, "end", None))
         send((state, "start", None))
@@ -73,7 +63,10 @@ def broadcast(metadata, sinks):
         while True:
             event, value = (yield)
             last_state = state
-            state = sms(event)
+            try:
+                state = states[state][1][event]
+            except KeyError:
+                raise DMLStateTransitionError(state, event)
             for sink in sinks:
                 if sink.closed:
                     continue
@@ -105,6 +98,6 @@ def broadcast(metadata, sinks):
             tmpfilename = sink.tmpfile.name
             sink.tmpfile.close()
             filename = os.path.join(metadata.working_dir, metadata.name + "." + sink.mod.EXTENSION)
-            print("written", filename)
             move(sink.tmpfile.name, filename)
+            print("written", filename)
             
