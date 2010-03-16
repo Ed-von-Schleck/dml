@@ -11,8 +11,6 @@ from __future__ import unicode_literals
 
 import os.path
 
-from src.constants import sink_events as events, states
-
 NAME = "debug"
 EXTENSION = "dbg"
 DESCRIPTION = "generates debug output"
@@ -27,10 +25,8 @@ def sink(metadata, file_obj):
         write = file_obj.write
         while True:
             state, event, value = (yield)
-            state_name = states._fields[state]
-            event_name = events._fields[event]
             value_name = "" if value is None else value
-            out = "{0:19}| {1:19}| {2:18}\n".format(state_name, event_name, value_name)
+            out = "{0:19}| {1:19}| {2:18}\n".format(state, event, value_name)
             if count == 40:
                 write(header)
                 count = 0

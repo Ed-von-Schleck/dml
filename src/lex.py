@@ -18,7 +18,6 @@ from array import array
 
 from src.dmlparser import parser_entry, parser_manager
 from macros import macros
-from src.constants import events
 from src.dmlexceptions import DMLMacroSyntaxError, DMLMacroNameError
 
 Source = namedtuple("Source", "file_obj filename lineno pos")
@@ -115,7 +114,7 @@ class DmlLex(object):
                     current_char = read(1)
                     pos += 1
                 else:
-                    broadcaster.send((events.END, None))
+                    broadcaster.send(("end", None))
                     break
 
 def macro_dispatch(broadcaster, metadata, lexer):

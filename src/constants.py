@@ -10,8 +10,5 @@ names = "Macro Name", "ouput", "Table Of Contents", "Paper Size", "Title", "Cast
 States = namedtuple("States", "START HEAD TITLE TITLE_BODY TITLE_BLOCK CAST CAST_BODY CAST_BLOCK ACT SCENE BODY BLOCK ACTOR DIALOG TITLE_TAG TITLE_VALUE ACTOR_DEC ACTOR_DES INLINE_DIR END")
 states = States(*xrange(20))
 
-Events = namedtuple("Events", "START CMD_LINE_OPTION MACRO_DATA TITLE_DEL CAST_DEL ACT_DEL SCENE_DEL DATA KEY_START KEY_END INLINE_DIR_START INLINE_DIR_END NEW_PARAGRAPH BLOCK_START BLOCK_END END")
-events = Events(*xrange(16))
-
 SinkEvents = namedtuple("SinkEvents", "START END DATA MACRO_DATA")
 sink_events = SinkEvents(*xrange(4))

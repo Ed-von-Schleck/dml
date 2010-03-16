@@ -5,7 +5,6 @@ from __future__ import unicode_literals
 import os.path
 from shutil import copyfileobj
 
-from src.constants import sink_events as events, states
 NAME = "html"
 EXTENSION = "html"
 DESCRIPTION = "generates HTML output"
@@ -24,28 +23,35 @@ def sink(metadata, file_obj):
                 
         # Start
         while True:
-            if state != states.START:
+            if state != "start":
                 break
             state, event, value = (yield)
         
         # Header
-        while state == states.HEAD:
-            if event == events.MACRO_DATA:
-                # TODO
-                continue
+        while state == "head":
+            if event == "macro_data":
+                # happily ignores "table of contents" or other requests
+                pass
             state, event, value = (yield)
         
         # Title
-        while state in (states.TITLE, states.TITLE_BODY, states.TITLE_BLOCK,
-                             states.TITLE_VALUE, states.TITLE_TAG):           
-            if state == states.TITLE:
-                if event == events.START:
+        while state in ("title", "title_body", "title_block",
+                             "title_value", "title_tag"):           
+            if state == "title":
+                if event == "start":
                     title = []
-                if event == events.DATA:
+                if event == "data":
                     title.append(value)
-                if event == events.END:
+                if event == "end":
                     title_infos["Title"] = " ".join(title)
-            if event == events.MACRO_DATA:
+            if state == "title":
+                if event == "start":
+                    title = []
+                if event == "data":
+                    title.append(value)
+                if event == "end":
+                    title_infos["Title"] = " ".join(title)
+            if event == "macro_data":
                 # TODO
                 continue
             state, event, value = (yield)
@@ -57,43 +63,43 @@ def sink(metadata, file_obj):
         write(title_infos["Title"])
         write("</h1>")
 
-        while state in (states.CAST, states.CAST_BODY, states.CAST_BLOCK,
-                             states.ACTOR_DES, states.ACTOR_DEC):
+        while state in ("cast", "cast_body", "cast_block",
+                             "actor_des", "actor_dec"):
             state, event, value = (yield)
 
         # main
         # if this doesn't make a convincing case for a switch statement in python
         # then I don't know one
-        while state != states.END:
-            if event == events.START:
-                if state == states.BLOCK:
+        while state != "end":
+            if event == "start":
+                if state == "block":
                     write("<p class='DML_block'>\n")
-                elif state == states.ACTOR:
+                elif state == "actor":
                     write("<p class='DML_dialog_line'><span class='DML_actor'>")
-                elif state == states.DIALOG:
+                elif state == "dialog":
                     write("<span class='DML_dialog'>")
-                elif state == states.INLINE_DIR:
+                elif state == "inline_dir":
                     write("<span class='DML_stage_direction'>")
-                elif state == states.ACT:
+                elif state == "act":
                     write("<h3 class='DML_act'>")
-                elif state == states.SCENE:
+                elif state == "scene":
                     write("<h4 class='DML_scene'>")
 
-            elif event == events.END:
-                if state == states.BLOCK:
+            elif event == "end":
+                if state == "block":
                     write("</p>\n")
-                elif state == states.ACTOR:
+                elif state == "actor":
                     write("</span>")
-                elif state == states.DIALOG:
+                elif state == "dialog":
                     write("</span></p>\n")
-                elif state == states.INLINE_DIR:
+                elif state == "inline_dir":
                     write("</span>")
-                elif state == states.ACT:
+                elif state == "act":
                     write("</h3>\n")
-                elif state == states.SCENE:
+                elif state == "scene":
                     write("</h4>")
                     
-            elif event == events.DATA:
+            elif event == "data":
                 if value == "\n":
                     write("<br />")
                 else:
@@ -102,7 +108,7 @@ def sink(metadata, file_obj):
             state, event, value = (yield)
         
         write("\n</body>")
-        while state == states.END:
+        while state == "end":
             state, event, value = (yield)
 
     except GeneratorExit:

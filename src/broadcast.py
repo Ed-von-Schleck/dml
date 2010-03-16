@@ -22,26 +22,24 @@ import os.path
 from collections import deque
 
 from src.states import state_tracker
-from src.constants import events, states, sink_events
-
 stack = deque()
 
 nested = [ \
-        (states.BODY, states.BLOCK), \
-        (states.TITLE_BODY, states.TITLE_BLOCK), \
-        (states.TITLE_BODY, states.TITLE_TAG), \
-        (states.TITLE_BODY, states.TITLE_VALUE), \
-        (states.BODY, states.ACTOR), \
-        (states.BODY, states.DIALOG), \
-        (states.DIALOG, states.INLINE_DIR), \
+        ("body", "block"), \
+        ("title_body", "title_block"), \
+        ("title_body", "title_tag"), \
+        ("title_body", "title_value"), \
+        ("body", "actor"), \
+        ("body", "dialog"), \
+        ("dialog", "inline_dir"), \
         ]
 
 def state_change(last_state, state, send):
     if (last_state, state) in nested:
         stack.append(last_state)
-        send((state, sink_events.START, None))
+        send((state, "start", None))
     elif stack:
-        send((last_state, sink_events.END, None))
+        send((last_state, "end", None))
         pop_state = stack.pop()
         if pop_state != state:
             state_change(pop_state, state, send)    # to understand recursion ...
@@ -49,8 +47,8 @@ def state_change(last_state, state, send):
             #stack.append(pop_state)
             pass
     else:
-        send((last_state, sink_events.END, None))
-        send((state, sink_events.START, None))
+        send((last_state, "end", None))
+        send((state, "start", None))
 
 def broadcast(metadata, sinks):
     """
@@ -68,7 +66,7 @@ def broadcast(metadata, sinks):
     """
     state_machine = state_tracker()
     state_machine.next()
-    state = states.START
+    state = "start"
     sms = state_machine.send
     
     try:
@@ -88,10 +86,10 @@ def broadcast(metadata, sinks):
                     if last_state != state:
                         state_change(last_state, state, send)
                         
-                    if event == events.DATA:
-                        send((state, sink_events.DATA, value))
-                    elif event == events.MACRO_DATA:
-                        send((state, sink_events.MACRO_DATA, value))
+                    if event == "data":
+                        send((state, "data", value))
+                    elif event == "macro_data":
+                        send((state, "macro_data", value))
                     
                 # if the sink or any of the filters stops, we stop the whole chain
                 except StopIteration:

@@ -4,107 +4,106 @@ from __future__ import unicode_literals
 
 from collections import namedtuple
 
-from src.constants import events, states
 from src.dmlexceptions import DMLStateTransitionError
 
 def state_tracker():
-    state = states.START
+    state = "start"
     # this is ugly, but the information has to go somewhere
     transitions = dict((
-        ((states.START, events.CMD_LINE_OPTION), states.START),
-        ((states.START, events.MACRO_DATA), states.HEAD),
-        ((states.START, events.TITLE_DEL), states.TITLE),
-        ((states.START, events.CAST_DEL), states.CAST),
-        ((states.START, events.ACT_DEL), states.ACT),
-        ((states.START, events.DATA), states.HEAD),
-        ((states.START, events.NEW_PARAGRAPH), states.HEAD),
+        (("start", "cmd_line_option"), "start"),
+        (("start", "macro_data"), "head"),
+        (("start", "title_del"), "title"),
+        (("start", "cast_del"), "cast"),
+        (("start", "act_del"), "act"),
+        (("start", "data"), "head"),
+        (("start", "new_paragraph"), "head"),
         
-        ((states.HEAD, events.DATA), states.HEAD),
-        ((states.HEAD, events.NEW_PARAGRAPH), states.HEAD),
-        ((states.HEAD, events.TITLE_DEL), states.TITLE),
-        ((states.HEAD, events.CAST_DEL), states.CAST),
-        ((states.HEAD, events.ACT_DEL), states.ACT),
-        ((states.HEAD, events.MACRO_DATA), states.HEAD),
+        (("head", "data"), "head"),
+        (("head", "new_paragraph"), "head"),
+        (("head", "title_del"), "title"),
+        (("head", "cast_del"), "cast"),
+        (("head", "act_del"), "act"),
+        (("head", "macro_data"), "head"),
         
-        ((states.TITLE, events.DATA), states.TITLE),
-        ((states.TITLE, events.TITLE_DEL), states.TITLE_BODY),
+        (("title", "data"), "title"),
+        (("title", "title_del"), "title_body"),
         
-        ((states.TITLE_BODY, events.NEW_PARAGRAPH), states.TITLE_BODY),
-        ((states.TITLE_BODY, events.DATA), states.TITLE_BODY),
-        ((states.TITLE_BODY, events.CAST_DEL), states.CAST),
-        ((states.TITLE_BODY, events.ACT_DEL), states.ACT),
-        ((states.TITLE_BODY, events.SCENE_DEL), states.SCENE),
-        ((states.TITLE_BODY, events.BLOCK_START), states.TITLE_BLOCK),
-        ((states.TITLE_BODY, events.KEY_START), states.TITLE_TAG),
+        (("title_body", "new_paragraph"), "title_body"),
+        (("title_body", "data"), "title_body"),
+        (("title_body", "cast_del"), "cast"),
+        (("title_body", "act_del"), "act"),
+        (("title_body", "scene_del"), "scene"),
+        (("title_body", "block_start"), "title_block"),
+        (("title_body", "key_del"), "title_tag"),
         
-        ((states.TITLE_TAG, events.DATA), states.TITLE_TAG),
-        ((states.TITLE_TAG, events.KEY_END), states.TITLE_VALUE),
+        (("title_tag", "data"), "title_tag"),
+        (("title_tag", "key_del"), "title_value"),
         
-        ((states.TITLE_VALUE, events.DATA), states.TITLE_VALUE),
-        ((states.TITLE_VALUE, events.KEY_START), states.TITLE_TAG),
-        ((states.TITLE_VALUE, events.NEW_PARAGRAPH), states.TITLE_BODY),
+        (("title_value", "data"), "title_value"),
+        (("title_value", "key_del"), "title_tag"),
+        (("title_value", "new_paragraph"), "title_body"),
         
-        ((states.TITLE_BLOCK, events.DATA), states.TITLE_BLOCK),
-        ((states.TITLE_BLOCK, events.NEW_PARAGRAPH), states.TITLE_BODY),
-        ((states.TITLE_BODY, events.MACRO_DATA), states.TITLE_BODY),
+        (("title_block", "data"), "title_block"),
+        (("title_block", "new_paragraph"), "title_body"),
+        (("title_body", "macro_data"), "title_body"),
         
-        ((states.CAST, events.DATA), states.CAST),
-        ((states.CAST, events.CAST_DEL), states.CAST_BODY),
-        ((states.CAST, events.MACRO_DATA), states.CAST),
+        (("cast", "data"), "cast"),
+        (("cast", "cast_del"), "cast_body"),
+        (("cast", "macro_data"), "cast"),
         
-        ((states.CAST_BODY, events.DATA), states.CAST_BODY),
-        ((states.CAST_BODY, events.ACT_DEL), states.ACT),
-        ((states.CAST_BODY, events.SCENE_DEL), states.SCENE),
-        ((states.CAST_BODY, events.NEW_PARAGRAPH), states.CAST_BODY),
-        ((states.CAST_BODY, events.BLOCK_START), states.CAST_BLOCK),
-        ((states.CAST_BODY, events.KEY_START), states.ACTOR_DEC),
+        (("cast_body", "data"), "cast_body"),
+        (("cast_body", "act_del"), "act"),
+        (("cast_body", "scene_del"), "scene"),
+        (("cast_body", "new_paragraph"), "cast_body"),
+        (("cast_body", "block_start"), "cast_block"),
+        (("cast_body", "key_del"), "actor_dec"),
         
-        ((states.CAST_BLOCK, events.DATA), states.CAST_BLOCK),
-        ((states.CAST_BLOCK, events.NEW_PARAGRAPH), states.CAST_BODY),
+        (("cast_block", "data"), "cast_block"),
+        (("cast_block", "new_paragraph"), "cast_body"),
         
-        ((states.ACTOR_DEC, events.DATA), states.ACTOR_DEC),
-        ((states.ACTOR_DEC, events.KEY_END), states.ACTOR_DES),
+        (("actor_dec", "data"), "actor_dec"),
+        (("actor_dec", "key_del"), "actor_des"),
         
-        ((states.ACTOR_DES, events.DATA), states.ACTOR_DES),
-        ((states.ACTOR_DES, events.KEY_START), states.ACTOR_DEC),
-        ((states.ACTOR_DES, events.NEW_PARAGRAPH), states.CAST_BODY),
+        (("actor_des", "data"), "actor_des"),
+        (("actor_des", "key_del"), "actor_dec"),
+        (("actor_des", "new_paragraph"), "cast_body"),
         
-        ((states.ACT, events.DATA), states.ACT),
-        ((states.ACT, events.ACT_DEL), states.BODY),
+        (("act", "data"), "act"),
+        (("act", "act_del"), "body"),
         
-        ((states.SCENE, events.DATA), states.SCENE),
-        ((states.SCENE, events.SCENE_DEL), states.BODY),
+        (("scene", "data"), "scene"),
+        (("scene", "scene_del"), "body"),
         
-        ((states.BODY, events.MACRO_DATA), states.BODY),
-        ((states.BODY, events.ACT_DEL), states.ACT),
-        ((states.BODY, events.SCENE_DEL), states.SCENE),
-        ((states.BODY, events.NEW_PARAGRAPH), states.BODY),
-        ((states.BODY, events.BLOCK_START), states.BLOCK),
-        ((states.BODY, events.KEY_START), states.ACTOR),
-        ((states.BODY, events.END), states.END),
+        (("body", "macro_data"), "body"),
+        (("body", "act_del"), "act"),
+        (("body", "scene_del"), "scene"),
+        (("body", "new_paragraph"), "body"),
+        (("body", "block_start"), "block"),
+        (("body", "key_del"), "actor"),
+        (("body", "end"), "end"),
         
-        ((states.BODY, events.KEY_START), states.ACTOR),
-        ((states.ACTOR, events.DATA), states.ACTOR),
-        ((states.ACTOR, events.KEY_END), states.DIALOG),
+        (("body", "key_del"), "actor"),
+        (("actor", "data"), "actor"),
+        (("actor", "key_del"), "dialog"),
         
-        ((states.DIALOG, events.DATA), states.DIALOG),
-        ((states.DIALOG, events.KEY_START), states.ACTOR),
-        ((states.DIALOG, events.NEW_PARAGRAPH), states.BODY),
-        ((states.DIALOG, events.INLINE_DIR_START), states.INLINE_DIR),
-        ((states.DIALOG, events.END), states.END),
+        (("dialog", "data"), "dialog"),
+        (("dialog", "key_del"), "actor"),
+        (("dialog", "new_paragraph"), "body"),
+        (("dialog", "inline_dir_del"), "inline_dir"),
+        (("dialog", "end"), "end"),
         
-        ((states.BLOCK, events.DATA), states.BLOCK),
-        ((states.BLOCK, events.NEW_PARAGRAPH), states.BODY),
-        ((states.BLOCK, events.END), states.END),
+        (("block", "data"), "block"),
+        (("block", "new_paragraph"), "body"),
+        (("block", "end"), "end"),
         
-        ((states.INLINE_DIR, events.DATA), states.INLINE_DIR),
-        ((states.INLINE_DIR, events.INLINE_DIR_END), states.DIALOG),
+        (("inline_dir", "data"), "inline_dir"),
+        (("inline_dir", "inline_dir_del"), "dialog"),
 
-        ((states.END, events.END), states.END))
+        (("end", "end"), "end"))
     )
     while True:
         event = (yield state)
         try:
             state = transitions[(state, event)]
         except KeyError:
-            raise DMLStateTransitionError(states._fields[state], events._fields[event])
+            raise DMLStateTransitionError(state, event)

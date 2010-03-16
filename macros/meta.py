@@ -4,7 +4,7 @@ from __future__ import print_function
 from __future__ import unicode_literals
 
 from src.dmlexceptions import DMLError
-from src.constants import events
+
     
 class Meta(object):
     def __init__(self, broadcaster, metadata, lexer):
@@ -25,17 +25,25 @@ class Meta(object):
         value = value.lower().strip()
         if key == "table_of_contents":
             if value in self.false_strings:
-                self.broadcaster.send((events.MACRO_DATA, (key, False)))
+                self.broadcaster.send(("macro_data", (key, False)))
                 return
             if value in self.true_strings:
-                self.broadcaster.send((events.MACRO_DATA, (key, True)))
+                self.broadcaster.send(("macro_data", (key, True)))
                 return
             raise DMLMetaSyntaxError("expected bool value ('True' or 'False')")
         if key == "paper_size":
             if value in self.papersizes:
-                self.broadcaster.send((events.MACRO_DATA, (key, value)))
+                self.broadcaster.send(("macro_data", (key, value)))
                 return
             raise DMLMetaSyntaxError("expected papersize value ('A5', 'A4', 'letter' and the like)")
+        if key == "two_page":
+            if value in self.false_strings:
+                self.broadcaster.send(("macro_data", (key, False)))
+                return
+            if value in self.true_strings:
+                self.broadcaster.send(("macro_data", (key, True)))
+                return
+            raise DMLMetaSyntaxError("expected bool value ('True' or 'False')")
         raise DMLMetaSyntaxError("unknown key")
         
                 
