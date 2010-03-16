@@ -35,10 +35,8 @@ def parser_entry(broadcaster):
                 send(("new_paragraph", None))
                 token = (yield)
                 if token == "\n":
-                    while True:
+                    while token == "\n":
                         token = (yield)
-                        if token != "\n":
-                            break
                 if token == "*":            # This delimits key (actor or tag or sth.).
                     with parser_manager(key, broadcaster) as key_parser:
                         while True:
@@ -49,8 +47,8 @@ def parser_entry(broadcaster):
                             tca((yield))    # It will return when the same number of '=' is seen
                                             # twice with data in-between
                 else:
-                    send(("block_start", None))  # If it's no macro, key or title, cast or act,
-                                                            # it must be a new block
+                    # If it's no macro, key or title, cast or act, it must be a new block
+                    send(("block_start", None))
                     send(("data", token))
                         
             elif token == "*":

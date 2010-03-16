@@ -14,7 +14,6 @@ import os.path
 NAME = "debug"
 EXTENSION = "dbg"
 DESCRIPTION = "generates debug output"
-filters = ()
 
 def sink(metadata, file_obj):
     print("starting sink '{0}' ...".format(NAME))

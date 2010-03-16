@@ -8,7 +8,6 @@ from shutil import copyfileobj
 NAME = "html"
 EXTENSION = "html"
 DESCRIPTION = "generates HTML output"
-filters = ()
 
 def sink(metadata, file_obj):
     print("starting sink '{0}' ...".format(NAME))

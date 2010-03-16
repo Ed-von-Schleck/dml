@@ -19,7 +19,7 @@ class NullDevice():
     def write(self, dummy_out):
         pass
         
-MySink = namedtuple("MySink", "mod cor filters tmpfile closed")
+MySink = namedtuple("MySink", "mod cor tmpfile closed")
 Metadata = namedtuple("Metadata", "filepath name filename working_dir")
 
 def main(dml_file, options):
@@ -35,18 +35,10 @@ def main(dml_file, options):
     sink_mods = [sinks.__dict__[mod] for mod in sinks.__all__]
     for mod in sink_mods:
         if options.__dict__[mod.NAME]:
-            #tmpfile = codecs.EncodedFile(NamedTemporaryFile(mode="w", delete=False), "utf-8")
             tmpfile = NamedTemporaryFile(mode="w", delete=False)
             cor = mod.sink(metadata, tmpfile)
             cor.next()
-            number_of_filters = len(mod.filters)
-            myfilters = []
-            for i in range(number_of_filters):
-                target = cor if i + 1 >= number_of_filters else mod.filters[i + 1]
-                myfilter = mod.filters[i](target, mod.SHORTNAME)
-                myfilter.next()
-                myfilters.append(myfilter)
-            mysinks.append(MySink(mod, cor, myfilters, tmpfile, False))
+            mysinks.append(MySink(mod, cor, tmpfile, False))
     
     broadcaster = broadcast(metadata, mysinks)
     broadcaster.next()

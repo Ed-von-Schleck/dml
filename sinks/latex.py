@@ -12,7 +12,6 @@ import os.path
 NAME = "latex"
 EXTENSION = "tex"
 DESCRIPTION = "generates latex output"
-filters = ()
 
 def sink(metadata, file_obj):
     print("starting sink '{0}' ...".format(NAME))

@@ -21,24 +21,8 @@ from shutil import copyfile, move
 import os.path
 from collections import deque
 
-from src.states import state_tracker
 from src.grammar import states
 from src.dmlexceptions import DMLStateTransitionError
-
-stack = deque()
-
-def state_change(last_state, state, send):
-    if state in states[last_state][0]:
-        stack.append(last_state)
-        send((state, "start", None))
-    elif stack:
-        send((last_state, "end", None))
-        pop_state = stack.pop()
-        if pop_state != state:
-            state_change(pop_state, state, send)    # to understand recursion ...
-    else:
-        send((last_state, "end", None))
-        send((state, "start", None))
 
 def broadcast(metadata, sinks):
     """
@@ -49,15 +33,27 @@ def broadcast(metadata, sinks):
     sinks -- the sinks selected at the command line
     
     yields:
-    event, key, name
+    parser_event, token (or None)
     
     sends:
-    state, event, key, name
+    state, event, token
     """
-    state_machine = state_tracker()
-    state_machine.next()
     state = "start"
-    sms = state_machine.send
+    stack = deque()
+
+    def state_change(last_state, state, send):
+        if state in states[last_state][0]:
+            stack.append(last_state)
+            send((state, "start", None))
+        elif stack:
+            # elif because syntax-wise states can't be stacked recursively
+            send((last_state, "end", None))
+            pop_state = stack.pop()
+            if pop_state != state:
+                state_change(pop_state, state, send)    # to understand recursion ...
+        else:
+            send((last_state, "end", None))
+            send((state, "start", None))
     
     try:
         while True:
@@ -71,15 +67,12 @@ def broadcast(metadata, sinks):
                 if sink.closed:
                     continue
                 try:
-                    if sink.filters:
-                        send = sink.filters[0].send
-                    else:
-                        send = sink.cor.send
+                    send = sink.cor.send
 
                     if last_state != state:
                         state_change(last_state, state, send)
                         
-                    if event == "data":
+                    elif event == "data":
                         send((state, "data", value))
                     elif event == "macro_data":
                         send((state, "macro_data", value))
@@ -87,9 +80,7 @@ def broadcast(metadata, sinks):
                 # if the sink or any of the filters stops, we stop the whole chain
                 except StopIteration:
                     sink.cor.close()
-                    sink._replace(closed= True)
-                    for myfilter in sink.filters:
-                        myfilter.close()
+                    sink._replace(closed=True)
             
     except GeneratorExit:
         pass
