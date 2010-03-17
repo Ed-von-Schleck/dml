@@ -7,18 +7,14 @@ Usage
 If you type 'dml --help' on the command line, you should see something like
 that:
 
-<pre>
+    Usage: dml [options] FILE
 
-Usage: dml [options] FILE
-
-Options:
-  -h, --help   show this help message and exit
-  -t, --html   generates HTML output
-  -d, --dml    generates DML output
-  -b, --debug  generates debug output
-  -q, --quiet  don't print status messages to stdout
-
-</pre>
+    Options:
+      -h, --help   show this help message and exit
+      -t, --html   generates HTML output
+      -d, --dml    generates DML output
+      -b, --debug  generates debug output
+      -q, --quiet  don't print status messages to stdout
 
 FILE must be a valid dml-file. The next section describes the syntax of it. If
 that file does not exist, dml with print an Error and exit.
@@ -31,47 +27,29 @@ Any other option controls the various ouptuts. Each will write a file in the
 working directory with the filename (without the '.dml' extension) + the
 backend extension. For example:
 
-$ dml --html path/to/my_funny_play.dml
+    $ dml --html path/to/my_funny_play.dml
 
 will write a 'my_funny_play.html' into your current directory. Any existing
 file named 'my_funny_play.html' in this directory will be overwritten.
 
 
-Backends
+Sinks
 --------
 
-There are two kinds of backends: sinks and postprocessors. It's not too
-difficult to write new backends; please consult the developers documentation if
+The backends that do the actual output are called sinks. It's not too
+difficult to write new sinks; please consult the developers documentation if
 you inted to do so.
 
 Sinks directly feed off the parser (they are called sinks because it's a
 streaming parser, and every event generated in the parser will eventually land
 there, but they themselves don't generate or forward any event. They are the
-end of the event food chain). They don't require third party tools to be
-installed manually.
+end of the event food chain).
 
 Sinks that come with dml:
 - debug: useful for introspection if something goes wrong or when writing a
    new sink
-- dml: transforms the dml into another dml. Yeah. Really.
 - html: outputs a valid xhtml file
-- latex: writes a nice latex file for further processing
-- pdf: native pdf output, see e.g. LaTeX2pdf for a postprocessor outputting
-   pretty pdfs
-
-Postprocessors don't recieve any events from anything at all, they rely on
-a sink to have done the dirty work. They just transform the output of a sink
-into something else (usually a pdf). So you might have a LaTeX sink and a
-LaTeX2pdf postprocessor, or a html sink and a html2pdf postprocessor. Post-
-processors usually have a '2' in their name to indicate where they get their
-source from. If a postprocessor is selected, it will automatically activate
-it's corresponding sink, whether you selected it or not. Postprocessors usually
-require a third party tool (like LaTeX). These tools may not be
-automatically installed if you install dml. Refer to the READMEs in the 
-'postprocessors' folder for installation help.
-
-Postprocessors that come with dml:
-- latex2pdf: like it says. Takes latex and boom! - pdf. Magic. Pure magic.
+- pdf: native pdf output,
 
 dml Syntax
 ==========
@@ -158,7 +136,7 @@ the dml file. For example:
 
 Options may be separated by newlines or ';'
 
-#TODO: list options
+TODO: list options
 
 #### include ####
 Include the contents of another dml-file in your play. Example:

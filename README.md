@@ -6,7 +6,9 @@ dml is licensed under the GNU Public License Version 3, see COPYING.
 
 See INSTALL for instructions on how to install dml on your system.
 
-A description of how to use dml is in MANUAL.
+To convert a dml-file to pdf and html, do
+    $ dml --pdf --html <path/to/dmlfile.dml>
+A detailed description of how to use dml is in MANUAL.
 
 You can browse the source and get recent releases on
 http://github.com/Ed-von-Schleck/dml
