@@ -43,7 +43,8 @@ def broadcast(metadata, sinks):
 
     def _state_change(last_state, state, send):
         if state in states[last_state][0]:
-            stack.append(last_state)
+            if not stack or stack[-1] != last_state:
+                stack.append(last_state)
             send((state, "start", None))
         elif stack:
             # elif because syntax-wise states can't be stacked recursively

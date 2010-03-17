@@ -64,7 +64,7 @@ def sink(metadata, file_obj):
 
         # main
         start_switch = {
-            "block": "<p class='DML_block'>\n",
+            "block": "<p class='DML_block'>",
             "actor": "<p class='DML_dialog_line'><span class='DML_actor'>",
             "dialog": "<span class='DML_dialog'>",
             "inline_dir": "<span class='DML_stage_direction'>",
@@ -84,13 +84,15 @@ def sink(metadata, file_obj):
                 try:
                     write(start_switch[state])
                 except KeyError:
-                    pass
+                    state, event, value = (yield)
+                    continue
 
             elif event == "end":
                 try:
                     write(end_switch[state])
                 except KeyError:
-                    pass
+                    state, event, value = (yield)
+                    continue
                     
             elif event == "data":
                 if value == "\n":

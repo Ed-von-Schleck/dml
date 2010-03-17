@@ -111,11 +111,12 @@ def sink(metadata, file_obj):
             if state == "title":
                 if event == "start":
                     title_layout = layout_manager.create_title_layout()
-                    title = []
+                    title = ["<span size='xx-large'>"]
                 if event == "data":
                     title.append(value)
                 if event == "end":
-                    title_layout.set_text(" ".join(title))
+                    title.append("</span>")
+                    title_layout.set_markup(" ".join(title))
             if event == "macro_data":
                 # TODO
                 continue
