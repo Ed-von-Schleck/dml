@@ -39,6 +39,13 @@ def sink(metadata, file_obj):
             def set_text(self, text):
                 self.pango_layout.set_text(text)
             
+            @property
+            def alignment(self):
+                return pango_layout.get_alignment()
+                
+            @alignment.setter(self, value):
+                pango_layout.set_alignment(value)
+            
             def get_height(self):
                 return self.pango_layout.get_size()[1] / pango.SCALE
                 
@@ -75,7 +82,7 @@ def sink(metadata, file_obj):
             satzspiegel = one_nineth[1], one_nineth[0] * 1.5, one_nineth[1] * 2, one_nineth[0] * 1.5
             position = (dpi_factor * satzspiegel[3], dpi_factor * satzspiegel[0])
             layout = self.MyLayout(self.pdf_surface, position, satzspiegel)
-            layout.pango_layout.set_alignment(pango.ALIGN_CENTER)
+            layout.alignment = pango.ALIGN_CENTER
             self._on_page.append(layout)
             return layout
         
@@ -119,36 +126,36 @@ def sink(metadata, file_obj):
             if state == "title":
                 if event == "start":
                     title = []
-                if event == "data":
+                elif event == "data":
                     title.append(value)
-                if event == "end":
+                elif event == "end":
                     attribs["title"] = " ".join(title)
                     del title
-            if state == "title_tag":
+            elif state == "title_tag":
                 if event == "start":
                     tag = []
-                if event == "data":
+                elif event == "data":
                     tag.append(value)
-                if event == "end":
+                elif event == "end":
                     current_tag = " ".join(tag)
-            if state == "title_value":
+            elif state == "title_value":
                 if event == "start":
                     val = []
-                if event == "data":
+                elif event == "data":
                     val.append(value)
-                if event == "end":
+                elif event == "end":
                     attribs[current_tag] = " ".join(val)
                     del val
-            if state == "title_block":
+            elif state == "title_block":
                 if event == "start":
                     block = []
-                if event == "data":
+                elif event == "data":
                     block.append(value)
-                if event == "end":
+                elif event == "end":
                     attribs["blocks"].append(" ".join(block))
                     del block
                     
-            if event == "macro_data":
+            elif event == "macro_data":
                 # TODO
                 continue
             state, event, value = (yield)
@@ -162,6 +169,23 @@ def sink(metadata, file_obj):
                     markup += "\n<span style='oblique'>" + block + "</span>\n"
                 title_layout.set_markup(markup)
                 title_layout.finish()
+        
+        while state in ("cast", "cast_body", "cast_block",
+                             "actor_des", "actor_dec"):
+            state, event, value = (yield)
+            # TODO
+        
+        while state != "end":
+            if state == "act":
+                if event == "start":
+                    act = []
+                elif event == "data":
+                    act.append(value)
+                elif event == "end":
+                    layout = layout_manager.create_title_layout()
+                    layout.alignment = pango.ALIGN_CENTER
+                
+                
         
         layout_manager.show_page()
         layout_manager.finish()
