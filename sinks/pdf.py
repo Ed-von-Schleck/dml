@@ -19,6 +19,7 @@ def sink(metadata, file_obj):
     class LayoutManager(object):
         class MyLayout(object):
             def __init__(self, pdf_surface, position, satzspiegel):
+                self.page_count = 0
                 cairo_context = cairo.Context(pdf_surface)
                 cairo_context.move_to(*position)
                 pangocairo_context = pangocairo.CairoContext(cairo_context)
@@ -60,7 +61,11 @@ def sink(metadata, file_obj):
             
         def create_layout(self):
             offset = sum([on_page_layout.get_height() for on_page_layout in self._on_page])
-            position = (dpi_factor * self.satzspiegel[3], dpi_factor * self.satzspiegel[0] + offset)
+            if self.current_page_left:
+                position = (dpi_factor * self.satzspiegel[3], dpi_factor * self.satzspiegel[0] + offset)
+            else:
+                position = (dpi_factor * self.satzspiegel[1], dpi_factor * self.satzspiegel[0] + offset)
+            self.current_page_left = not self.current_page_left
             layout = self.MyLayout(self.pdf_surface, position, self.satzspiegel)
             self._on_page.append(layout)
             return layout
@@ -75,6 +80,7 @@ def sink(metadata, file_obj):
             return layout
         
         def show_page(self):
+            self.page_count += 1
             self.pdf_surface.show_page()
             self._on_page = []
             
@@ -107,23 +113,56 @@ def sink(metadata, file_obj):
         
         # Title
         title_layout = None
-        while state in ("title", "title_body", "title_block", "title_value", "title_tag"):           
+        attribs = {"title": "", "author": "", "blocks": []}
+        current_tag = ""
+        while state in ("title", "title_body", "title_block", "title_value", "title_tag"):
             if state == "title":
                 if event == "start":
-                    title_layout = layout_manager.create_title_layout()
-                    title = ["<span size='xx-large'>"]
+                    title = []
                 if event == "data":
                     title.append(value)
                 if event == "end":
-                    title.append("</span>")
-                    title_layout.set_markup(" ".join(title))
+                    attribs["title"] = " ".join(title)
+                    del title
+            if state == "title_tag":
+                if event == "start":
+                    tag = []
+                if event == "data":
+                    tag.append(value)
+                if event == "end":
+                    current_tag = " ".join(tag)
+            if state == "title_value":
+                if event == "start":
+                    val = []
+                if event == "data":
+                    val.append(value)
+                if event == "end":
+                    attribs[current_tag] = " ".join(val)
+                    del val
+            if state == "title_block":
+                if event == "start":
+                    block = []
+                if event == "data":
+                    block.append(value)
+                if event == "end":
+                    attribs["blocks"].append(" ".join(block))
+                    del block
+                    
             if event == "macro_data":
                 # TODO
                 continue
             state, event, value = (yield)
+        else:
+            if attribs["title"]:
+                title_layout = layout_manager.create_title_layout()
+                markup = ""
+                markup += "<span size='large'>" + attribs["author"] + "</span>\n"
+                markup += "<span size='xx-large'>" + attribs["title"] + "</span>\n"
+                for block in attribs["blocks"]:
+                    markup += "\n<span style='oblique'>" + block + "</span>\n"
+                title_layout.set_markup(markup)
+                title_layout.finish()
         
-        if title_layout is not None:
-            title_layout.finish()
         layout_manager.show_page()
         layout_manager.finish()
 

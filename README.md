@@ -1,6 +1,6 @@
 dml (drama markup language) defines a human-readable markup language to write
-theatrical plays, as well as ways to convert it to many other formats, like
-html, latex or pdf.
+theatrical plays, as well as ways to convert it to other formats like
+html or pdf.
 
 dml is licensed under the GNU Public License Version 3, see COPYING.
 

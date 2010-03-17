@@ -48,14 +48,14 @@ def sink(metadata, file_obj):
                 # TODO
                 continue
             state, event, value = (yield)
-        
-        if title is not None:
-            write("<title>")
-            write(title_infos["Title"])
-            write("</title>\n<body>\n")
-            write("<h1 id='DML_title'>")
-            write(title_infos["Title"])
-            write("</h1>")
+        else:
+            if title is not None:
+                write("<title>")
+                write(title_infos["Title"])
+                write("</title>\n<body>\n")
+                write("<h1 id='DML_title'>")
+                write(title_infos["Title"])
+                write("</h1>")
 
         while state in ("cast", "cast_body", "cast_block",
                              "actor_des", "actor_dec"):

@@ -131,8 +131,8 @@ macro name and then a block delimited by '{' and '}'. Here's what they do:
 Used to declare metadata in key/value pairs. Only useful in the header of
 the dml file. For example:
 
-@meta table_of_contents: True
-@meta paper_size: A5
+    @meta table_of_contents: True
+    @meta paper_size: A5
 
 Options may be separated by newlines or ';'
 
@@ -141,7 +141,7 @@ TODO: list options
 #### include ####
 Include the contents of another dml-file in your play. Example:
 
-@include a_part_of_a_play.dml
+    @include a_part_of_a_play.dml
 
 The file to be included must be in the directory of the parent file or in your
 working (current) directory.
