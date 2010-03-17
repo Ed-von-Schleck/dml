@@ -2,7 +2,6 @@
 from __future__ import print_function
 from __future__ import unicode_literals
 
-import os.path
 from shutil import copyfileobj
 
 NAME = "html"
@@ -15,10 +14,11 @@ def sink(metadata, file_obj):
         with open("sinks/html/boilerplate") as boilerplate:
             copyfileobj(boilerplate, file_obj)
         write = file_obj.write
-        state, event, value = (yield)
         
         table_of_contents = False
         title_infos = {}
+        
+        state, event, value = (yield)
                 
         # Start
         while True:
@@ -34,6 +34,7 @@ def sink(metadata, file_obj):
             state, event, value = (yield)
         
         # Title
+        title = None
         while state in ("title", "title_body", "title_block",
                              "title_value", "title_tag"):           
             if state == "title":
@@ -48,48 +49,48 @@ def sink(metadata, file_obj):
                 continue
             state, event, value = (yield)
         
-        write("<title>")
-        write(title_infos["Title"])
-        write("</title>\n<body>\n")
-        write("<h1 id='DML_title'>")
-        write(title_infos["Title"])
-        write("</h1>")
+        if title is not None:
+            write("<title>")
+            write(title_infos["Title"])
+            write("</title>\n<body>\n")
+            write("<h1 id='DML_title'>")
+            write(title_infos["Title"])
+            write("</h1>")
 
         while state in ("cast", "cast_body", "cast_block",
                              "actor_des", "actor_dec"):
             state, event, value = (yield)
+            # TODO
 
         # main
+        start_switch = {
+            "block": "<p class='DML_block'>\n",
+            "actor": "<p class='DML_dialog_line'><span class='DML_actor'>",
+            "dialog": "<span class='DML_dialog'>",
+            "inline_dir": "<span class='DML_stage_direction'>",
+            "act": "<h3 class='DML_act'>",
+            "scene": "<h4 class='DML_scene'>"}
+        end_switch = {
+            "block": "</p>\n",
+            "actor": "</span>",
+            "dialog": "</span></p>\n",
+            "inline_dir": "</span>",
+            "act": "</h3>\n",
+            "scene": "</h4>"}
         # if this doesn't make a convincing case for a switch statement in python
         # then I don't know one
         while state != "end":
             if event == "start":
-                if state == "block":
-                    write("<p class='DML_block'>\n")
-                elif state == "actor":
-                    write("<p class='DML_dialog_line'><span class='DML_actor'>")
-                elif state == "dialog":
-                    write("<span class='DML_dialog'>")
-                elif state == "inline_dir":
-                    write("<span class='DML_stage_direction'>")
-                elif state == "act":
-                    write("<h3 class='DML_act'>")
-                elif state == "scene":
-                    write("<h4 class='DML_scene'>")
+                try:
+                    write(start_switch[state])
+                except KeyError:
+                    pass
 
             elif event == "end":
-                if state == "block":
-                    write("</p>\n")
-                elif state == "actor":
-                    write("</span>")
-                elif state == "dialog":
-                    write("</span></p>\n")
-                elif state == "inline_dir":
-                    write("</span>")
-                elif state == "act":
-                    write("</h3>\n")
-                elif state == "scene":
-                    write("</h4>")
+                try:
+                    write(end_switch[state])
+                except KeyError:
+                    pass
                     
             elif event == "data":
                 if value == "\n":

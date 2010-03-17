@@ -1,4 +1,4 @@
 # -*- coding: utf-8
-__all__ = ["html", "debug", "latex"]
+__all__ = ["html", "debug", "pdf"]
 
-import html, debug, latex
+import html, debug, pdf
