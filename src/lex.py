@@ -61,19 +61,20 @@ class DmlLex(object):
         pos = self.pos
         with nested(parser_manager(parser_entry, broadcaster),
                     parser_manager(macro_dispatch, broadcaster, metadata, self)) as (entry, dispatch):
-            entry("\n")                     # new file is like newline, isn't it?
+            #entry("\n")                     # new file is like newline, isn't it?
             while True:
                 read = self._file_obj.read  # can be changed by push/pop_source
                 current_char = read(1)
+                
                 pos += 1
                 self.pos = pos              # likewise
                 current_token = []          # faster than deque(), I tested it
-                #current_token = array(b'u')
                 current_token_append = current_token.append
                 while current_char or self._source_stack:
                     if not current_char:
                         if current_token:
                             entry(concenate(current_token))
+                        entry("\n")
                         self.pop_source()
                         break
                     if current_char in whitespace:
@@ -102,6 +103,7 @@ class DmlLex(object):
                         entry("\n")
                         break
                     if current_char == '@':
+                        
                         if current_token:
                             entry(concenate(current_token))
                         dispatch(self._file_obj.readline())

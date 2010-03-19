@@ -17,6 +17,7 @@ class Meta(object):
         
     def action(self, data):
         key, sep, value = data.partition(":")
+        
         if not sep:
             raise DMLMetaSyntaxError("expected ':' in macro expression")
         if not value:
@@ -27,20 +28,20 @@ class Meta(object):
             if value in self.false_strings:
                 self.broadcaster.send(("macro_data", (key, False)))
                 return
-            if value in self.true_strings:
+            elif value in self.true_strings:
                 self.broadcaster.send(("macro_data", (key, True)))
                 return
             raise DMLMetaSyntaxError("expected bool value ('True' or 'False')")
-        if key == "paper_size":
+        elif key == "paper_size":
             if value in self.papersizes:
                 self.broadcaster.send(("macro_data", (key, value)))
                 return
             raise DMLMetaSyntaxError("expected papersize value ('A5', 'A4', 'letter' and the like)")
-        if key == "two_page":
+        elif key == "two_page":
             if value in self.false_strings:
                 self.broadcaster.send(("macro_data", (key, False)))
                 return
-            if value in self.true_strings:
+            elif value in self.true_strings:
                 self.broadcaster.send(("macro_data", (key, True)))
                 return
             raise DMLMetaSyntaxError("expected bool value ('True' or 'False')")

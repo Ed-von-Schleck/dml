@@ -17,6 +17,7 @@ from __future__ import unicode_literals
 
 states = {
     "start": ([], {
+        "new_paragraph": "head",
         "macro_data": "head",
         "cmd_line_option": "start",
         "act_del": "act",
@@ -47,20 +48,26 @@ states = {
         "data": "dialog",
         "key_del": "actor",
         "inline_dir_del": "inline_dir",
-        "new_paragraph": "body",
+        "new_paragraph": "empty_line",
         "end": "end"}),
     "block": ([], {
         "data": "block",
-        "new_paragraph": "body",
+        "new_paragraph": "empty_line",
         "end": "end"}),
-    "body": (["actor", "dialog", "block"], {
+    "body": (["actor", "dialog", "block", "empty_line"], {
         "key_del": "actor",
         "block_start": "block",
         "act_del": "act",
         "scene_del": "scene",
-        "new_paragraph": "body",
+        "new_paragraph": "empty_line",
         "end": "end"}),
-
+    "empty_line": ([], {
+        "key_del": "actor",
+        "block_start": "block",
+        "act_del": "act",
+        "scene_del": "scene",
+        "new_paragraph": "empty_line",
+        "end": "end"}),
     "title_tag": ([], {
         "data": "title_tag",
         "key_del": "title_value"}),
@@ -109,5 +116,8 @@ states = {
         "title_del": "title",
         "new_paragraph": "head",
         "macro_data": "head",
+        "end": "end"}),
+        
+    "end": ([], {
         "end": "end"}),
 }

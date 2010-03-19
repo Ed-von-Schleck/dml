@@ -41,7 +41,7 @@ def broadcast(metadata, sinks):
     state = "start"
     stack = deque()
 
-    def _state_change(last_state, state, send):
+    def _state_change_old(last_state, state, send):
         if state in states[last_state][0]:
             if not stack or stack[-1] != last_state:
                 stack.append(last_state)
@@ -52,6 +52,17 @@ def broadcast(metadata, sinks):
             pop_state = stack.pop()
             if pop_state != state:
                 _state_change(pop_state, state, send)    # to understand recursion ...
+        else:
+            send((last_state, "end", None))
+            send((state, "start", None))
+            
+    def _state_change(last_state, state, send):
+        if state in states[last_state][0]:
+            # the new state is child the last one
+            send((state, "start", None))
+        elif last_state in states[state][0]:
+            # the new state is parent of the last one
+            send((last_state, "end", None))
         else:
             send((last_state, "end", None))
             send((state, "start", None))
@@ -73,7 +84,7 @@ def broadcast(metadata, sinks):
                     if last_state != state:
                         _state_change(last_state, state, send)
                         
-                    elif event == "data":
+                    if event == "data":
                         send((state, "data", value))
                     elif event == "macro_data":
                         send((state, "macro_data", value))
