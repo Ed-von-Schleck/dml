@@ -25,8 +25,8 @@ def sink(metadata, file_obj):
                 pangocairo_context = pangocairo.CairoContext(cairo_context)
                 pango_layout = pangocairo_context.create_layout()
                 pango_layout.set_justify(True)
-                pango_layout.set_spacing(2 * pango.SCALE)
-                pango_layout.set_font_description(pango.FontDescription("serif normal 10"))
+                pango_layout.set_spacing(1.5 * pango.SCALE)
+                pango_layout.set_font_description(pango.FontDescription("serif normal 9"))
                 pango_layout.set_width(int(pango.SCALE *  
                     (paper_sizes[meta_infos["paper_size"]][0] * dpi_factor -
                     satzspiegel[1] - satzspiegel[3])))
@@ -72,21 +72,13 @@ def sink(metadata, file_obj):
             def indent(self, value):
                 return self._pango_layout.set_indent(value * pango.SCALE)
                 
-            @property
-            def block_indent(self):
-                pass # TODO
-                
-            @block_indent.setter
-            def block_indent(self, value):
-                return self._cairo_context.move_to(self._position[0] + value, self._position[1])
-                
             @alignment.setter
             def alignment(self, value):
                 self._pango_layout.set_alignment(value)
             
             @property
             def height(self):
-                return self._pango_layout.get_size()[1] / pango.SCALE + self._pango_layout.get_spacing() / pango.SCALE
+                return (self._pango_layout.get_size()[1] + self._pango_layout.get_spacing()) / pango.SCALE
                 
             @property
             def line_count(self):
@@ -97,11 +89,10 @@ def sink(metadata, file_obj):
                 # pango.Layout.set_height(), unfortunatelly the gtk python
                 # bindings don't sport that method though it's in C (and
                 # other bindings) for some time. Damn.
-                if (break_after and self._page_manager.unused_height >= 0) \
+                if (break_after and self._page_manager.unused_height >= self.height) \
                 or (not break_after and self._page_manager.unused_height >= self._page_manager.line_height * 2):
-                    
                     self._pangocairo_context.show_layout(self._pango_layout)
-                    self._page_manager.lines_on_page += self.line_count
+                    self._page_manager.used_height += self.height
                 elif break_after:
                     rest_markup = []
                     i = 0
@@ -110,7 +101,7 @@ def sink(metadata, file_obj):
                     backup = self._pango_layout.copy()
                     for markup in markup_list:
                         self.add_markup(markup)
-                        if self._page_manager.unused_height >= 0:
+                        if self._page_manager.unused_height >= self.height:
                             i += 1
                             backup = self._pango_layout.copy()
                         else:
@@ -143,7 +134,6 @@ def sink(metadata, file_obj):
             self.pdf_surface = pdf_surface = cairo.PDFSurface(file_obj,
                    paper_sizes[meta_infos["paper_size"]][0] * dpi_factor,
                    paper_sizes[meta_infos["paper_size"]][1] * dpi_factor)
-            self._on_page = []
             self.current_page_left = False
             one_nineth = paper_sizes[meta_infos["paper_size"]][0] / 9 * dpi_factor, paper_sizes[meta_infos["paper_size"]][1] / 9 * dpi_factor
             if meta_infos["two_page"]:
@@ -152,7 +142,6 @@ def sink(metadata, file_obj):
                 self.satzspiegel = one_nineth[1], one_nineth[0] * 1.5, one_nineth[1] * 2, one_nineth[0] * 1.5
             self._maximal_height = one_nineth[1] * 6
             self.one_nineth = one_nineth
-            self.lines_on_page = 0
             
             # get line_height
             temp_layout = self.MyLayout(self.pdf_surface, (0, 0), self.satzspiegel, self)
@@ -160,15 +149,15 @@ def sink(metadata, file_obj):
             temp_layout._pango_layout.set_spacing(2)
             self.line_height = temp_layout.height
             self._maximal_lines = int(one_nineth[1] * 6 / self.line_height * 2.54)
+            self.used_height = 0
             
         def create_layout(self):
             satzspiegel = self.satzspiegel
             if self.current_page_left:
-                position = (satzspiegel[3], satzspiegel[0] + self.offset)
+                position = (satzspiegel[3], satzspiegel[0] + self.used_height)
             else:
-                position = (satzspiegel[1], satzspiegel[0] + self.offset)
+                position = (satzspiegel[1], satzspiegel[0] + self.used_height)
             layout = self.MyLayout(self.pdf_surface, position, satzspiegel, self)
-            self._on_page.append(layout)
             return layout
             
         def create_title_layout(self):
@@ -177,7 +166,6 @@ def sink(metadata, file_obj):
             position = (satzspiegel[3], satzspiegel[0])
             layout = self.MyLayout(self.pdf_surface, position, satzspiegel, self)
             layout.alignment = pango.ALIGN_CENTER
-            self._on_page.append(layout)
             return layout
         
         def _show_page_number(self):
@@ -204,24 +192,15 @@ def sink(metadata, file_obj):
             self.page_count += 1
             self.current_page_left = not self.current_page_left
             self.pdf_surface.show_page()
-            self.lines_on_page = 0
-            self._on_page = []
+            self.used_height = 0
             
         def finish(self):
             self._show_page_number()
             self.pdf_surface.finish()
             
         @property
-        def offset(self):
-            return sum([on_page_layout.height for on_page_layout in self._on_page])
-        
-        @property
-        def line_count(self):
-            return sum([on_page_layout.line_count for on_page_layout in self._on_page])
-            
-        @property
         def unused_height(self):
-            return self._maximal_height - self.offset
+            return self._maximal_height - self.used_height
 
             
     print("starting sink '{0}' ...".format(NAME))

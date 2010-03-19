@@ -19,7 +19,6 @@ from __future__ import unicode_literals
 
 from shutil import copyfile, move
 import os.path
-from collections import deque
 
 from src.grammar import states
 from src.dmlexceptions import DMLStateTransitionError
@@ -39,33 +38,6 @@ def broadcast(metadata, sinks):
     state, event, token
     """
     state = "start"
-    stack = deque()
-
-    def _state_change_old(last_state, state, send):
-        if state in states[last_state][0]:
-            if not stack or stack[-1] != last_state:
-                stack.append(last_state)
-            send((state, "start", None))
-        elif stack:
-            # elif because syntax-wise states can't be stacked recursively
-            send((last_state, "end", None))
-            pop_state = stack.pop()
-            if pop_state != state:
-                _state_change(pop_state, state, send)    # to understand recursion ...
-        else:
-            send((last_state, "end", None))
-            send((state, "start", None))
-            
-    def _state_change(last_state, state, send):
-        if state in states[last_state][0]:
-            # the new state is child the last one
-            send((state, "start", None))
-        elif last_state in states[state][0]:
-            # the new state is parent of the last one
-            send((last_state, "end", None))
-        else:
-            send((last_state, "end", None))
-            send((state, "start", None))
     
     try:
         while True:
@@ -82,7 +54,15 @@ def broadcast(metadata, sinks):
                     send = sink.cor.send
 
                     if last_state != state:
-                        _state_change(last_state, state, send)
+                        if state in states[last_state][0]:
+                            # the new state is child the last one
+                            send((state, "start", None))
+                        elif last_state in states[state][0]:
+                            # the new state is parent of the last one
+                            send((last_state, "end", None))
+                        else:
+                            send((last_state, "end", None))
+                            send((state, "start", None))
                         
                     if event == "data":
                         send((state, "data", value))
