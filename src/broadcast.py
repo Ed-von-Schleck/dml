@@ -37,7 +37,7 @@ def broadcast(metadata, sinks):
     sends:
     state, event, token
     """
-    state = "start"
+    state = b"start"
     data = intern(b"data")
     try:
         while True:

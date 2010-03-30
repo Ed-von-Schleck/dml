@@ -46,23 +46,23 @@ def main(dml_file, options):
     try:
         try:
             dml = io.open(dml_file, "rU", encoding="utf-8")
-            print("opening", dml_file, "...")
+            print(b"opening", dml_file, b"...")
             lexer = DmlLex(dml, filename=dml_file)
             lexer.run(broadcaster, metadata)
         except IOError:
             pass
         finally:
             dml.close()
-            print("closed", dml_file)
+            print(b"closed", dml_file)
     except DMLError as dml_error:
         import linecache
-        print ("*" * 80)
-        print("A", dml_error.error_name, "was encountered:")
+        print (b"*" * 80)
+        print(b"A", dml_error.error_name, b"was encountered:")
         print(dml_error)
-        print("\tfile:  ", lexer.filename)
-        print("\tline:  ", lexer.lineno)
-        print("\tcolumn:", lexer.pos)
+        print(b"\tfile:  ", lexer.filename)
+        print(b"\tline:  ", lexer.lineno)
+        print(b"\tcolumn:", lexer.pos)
         print(linecache.getline(lexer.filename, lexer.lineno), end="")
-        print(" " * (lexer.pos - 1) + "^")
-        print ("*" * 80)
+        print(b" " * (lexer.pos - 1) + b"^")
+        print (b"*" * 80)
         sys.exit(1)

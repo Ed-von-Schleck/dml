@@ -217,10 +217,13 @@ def sink(metadata, file_obj):
                       "language": None}
         
         state, event, value = (yield)
+        data = intern(b"data")
+        start = intern(b"start")
+        end = intern(b"end")
                 
         # Start
         while True:
-            if state != "start":
+            if state is not start:
                 break
             state, event, value = (yield)
         
@@ -237,36 +240,36 @@ def sink(metadata, file_obj):
         title_layout = None
         attribs = {"title": "", "author": "", "blocks": []}
         current_tag = ""
-        while state in ("title", "title_body", "title_block", "title_value", "title_tag"):
+        while state in (b"title", b"title_body", b"title_block", b"title_value", b"title_tag"):
             if state == b"title":
-                if event == b"start":
+                if event is start:
                     title = []
-                elif event == b"data":
+                elif event is data:
                     title.append(value)
-                elif event == b"end":
+                elif event is end:
                     attribs["title"] = " ".join(title)
                     del title
             elif state == b"title_tag":
-                if event == b"start":
+                if event is start:
                     tag = []
-                elif event == b"data":
+                elif event is data:
                     tag.append(value)
-                elif event == b"end":
+                elif event is end
                     current_tag = " ".join(tag)
             elif state == b"title_value":
-                if event == b"start":
+                if event is start:
                     val = []
-                elif event == b"data":
+                elif event is data:
                     val.append(value)
-                elif event == b"end":
+                elif event is end
                     attribs[current_tag] = " ".join(val)
                     del val
             elif state == b"title_block":
-                if event == b"start":
+                if event is start:
                     block = []
-                elif event == b"data":
+                elif event is data:
                     block.append(value)
-                elif event == b"end":
+                elif event is end
                     attribs["blocks"].append(" ".join(block))
                     del block
                     
@@ -292,62 +295,62 @@ def sink(metadata, file_obj):
             # TODO
         
         current_dialog_line = ""
-        while state != b"end":
+        while state is not end:
             if state == b"act":                
-                if event == b"start":
+                if event is start:
                     act = []
-                elif event == b"data":
+                elif event is data:
                     act.append(value)
-                elif event == b"end":
+                elif event is end
                     layout = page_manager.create_layout()
                     layout.alignment = pango.ALIGN_CENTER
                     layout.set_markup("<span size='x-large'>" + " ".join(act) + "</span>")
                     layout.finish(break_after=False)
             elif state == b"scene":                
-                if event == b"start":
+                if event is start:
                     scene = []
-                elif event == b"data":
+                elif event is data:
                     scene.append(value)
-                elif event == b"end":
+                elif event is end
                     layout = page_manager.create_layout()
                     layout.alignment = pango.ALIGN_CENTER
                     layout.set_markup("\n<span size='large'>" + " ".join(scene) + "</span>")
                     layout.finish(break_after=False)
             elif state == b"block":
-                if event == b"start":
+                if event is start:
                     layout = page_manager.create_layout()
-                elif event == b"data":
+                elif event is data:
                     layout.add_markup("<span style='oblique'>" + value + "</span>")
-                elif event == b"end":
+                elif event is end
                     layout.finish()
             elif state == b"empty_line":
-                if event == b"end":
+                if event is end
                     layout = page_manager.create_layout()
                     layout.text = ""
                     layout.finish()
             elif state == b"actor":
-                if event == b"start":
+                if event is start:
                     dialog_layout = page_manager.create_layout()
                     dialog_layout.indent = -20
-                elif event == b"data":
+                elif event is data:
                     dialog_layout.add_markup("<span weight='bold'>" + value + "</span> ")
-                elif event == b"end":
+                elif event is end
                     pass
             elif state == b"dialog":
-                if event == b"start":
+                if event is start:
                     #dialog = []
                     pass
-                elif event == b"data":
+                elif event is data:
                     #dialog.append(value)
                     dialog_layout.add_markup(value)
-                elif event == b"end":
+                elif event is end
                     dialog_layout.finish()
             elif state == b"inline_dir":
-                if event == b"start":
+                if event is start:
                     pass
-                elif event == b"data":
+                elif event is data:
                      dialog_layout.add_markup("<span style='oblique'>" + value + "</span>")
-                elif event == b"end":
+                elif event is end
                     pass
                     
             state, event, value = (yield)

@@ -103,7 +103,6 @@ class DmlLex(object):
                         entry("\n")
                         break
                     if current_char == '@':
-                        
                         if current_token:
                             entry(concenate(current_token))
                         dispatch(self._file_obj.readline())
