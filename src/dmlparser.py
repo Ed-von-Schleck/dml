@@ -32,7 +32,7 @@ def parser_entry(broadcaster):
         if token == "\n":                   # On the first newline don't send any special events.
             token = (yield)
             if token == "\n":               # The second newline indicates a new paragraph.
-                send(("new_paragraph", None))
+                send((b"new_paragraph", None))
                 token = (yield)
                 if token == "\n":
                     while token == "\n":
@@ -48,8 +48,8 @@ def parser_entry(broadcaster):
                                             # twice with data in-between
                 else:
                     # If it's no macro, key or title, cast or act, it must be a new block
-                    send(("block_start", None))
-                    send(("data", token))
+                    send((b"block_start", None))
+                    send((b"data", token))
                         
             elif token == "*":
                 with parser_manager(key, broadcaster) as key_parser:
@@ -62,24 +62,24 @@ def parser_entry(broadcaster):
                         tca((yield))
                         
             elif token in "<>":
-                send(("inline_dir_del", None))
+                send((b"inline_dir_del", None))
                 
             else:
-                send(("data", token))
+                send((b"data", token))
                 
         elif token == "\\":
             token = (yield)
             if token == "\\":               # '\\' forces a line break.
-                send(("data", "\n"))
+                send((b"data", "\n"))
             else:                           # '\' is waved through.
-                send(("data", "\\"))
-                send(("data", token))
+                send((b"data", "\\"))
+                send((b"data", token))
                 
         elif token in "<>":
-            send(("inline_dir_del", None))
+            send((b"inline_dir_del", None))
         
         else:
-            send(("data", token))
+            send((b"data", token))
 
 def title_cast_or_act(broadcaster):
     """
@@ -92,33 +92,33 @@ def title_cast_or_act(broadcaster):
     token = (yield)
     send = broadcaster.send
     if token != "=":
-        send(("title_del", None))
+        send((b"title_del", None))
         while True:
-            send(("data", token))
+            send((b"data", token))
             token = (yield)
             if token == "=":
-                send(("title_del", None))
+                send((b"title_del", None))
                 break
     else:
         token = (yield)
         if token != "=":
-            send(("cast_del", None))
+            send((b"cast_del", None))
             while True:
-                send(("data", token))
+                send((b"data", token))
                 token = (yield)
                 if token != "=":
                     continue
                 token = (yield)
                 if token == "=":
-                    send(("cast_del", None))
+                    send((b"cast_del", None))
                     break
                 raise DMLSyntaxError(token, "=")
         else:
             token = (yield)
             if token != "=":
-                send(("act_del", None))
+                send((b"act_del", None))
                 while True:
-                    send(("data", token))
+                    send((b"data", token))
                     token = (yield)
                     if token != "=":
                         continue
@@ -126,16 +126,16 @@ def title_cast_or_act(broadcaster):
                     if token == "=":
                         token = (yield)
                         if token == "=":
-                            send(("act_del", None))
+                            send((b"act_del", None))
                             break
                         raise DMLSyntaxError(token, "=")
                     raise DMLSyntaxError(token, "==")
             else:
                 token = (yield)
                 if token != "=":
-                    send(("scene_del", None))
+                    send((b"scene_del", None))
                     while True:
-                        send(("data", token))
+                        send((b"data", token))
                         token = (yield)
                         if token != "=":
                             continue
@@ -145,7 +145,7 @@ def title_cast_or_act(broadcaster):
                             if token == "=":
                                 token = (yield)
                                 if token == "=":
-                                    send(("scene_del", None))
+                                    send((b"scene_del", None))
                                     break
                                 raise DMLSyntaxError(token, "=")
                             raise DMLSyntaxError(token, "==")
@@ -157,13 +157,14 @@ def key(broadcaster):
     This little critter gets called when a '*' is seen. It sends data until
     a the next '*' is encountered.
     """
-    broadcaster.send(("key_del", None))
+    send = broadcaster.send
+    send((b"key_del", None))
     while True:
         token = (yield)
         if token == "*":
-            broadcaster.send(("key_del", None))
+            send((b"key_del", None))
             break
-        broadcaster.send(("data", token))
+        send((b"data", token))
         
 @contextmanager
 def parser_manager(coroutine, *args, **kwargs):

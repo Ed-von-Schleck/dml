@@ -116,7 +116,7 @@ class DmlLex(object):
                     current_char = read(1)
                     pos += 1
                 else:
-                    broadcaster.send(("end", None))
+                    broadcaster.send((b"end", None))
                     break
 
 def macro_dispatch(broadcaster, metadata, lexer):

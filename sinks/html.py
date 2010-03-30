@@ -19,32 +19,35 @@ def sink(metadata, file_obj):
         title_infos = {}
         
         state, event, value = (yield)
-                
+        data = intern(b"data")
+        start = intern(b"start")
+        end = intern(b"end")
+        
         # Start
         while True:
-            if state != "start":
+            if state != b"start":
                 break
             state, event, value = (yield)
         
         # Header
-        while state == "head":
-            if event == "macro_data":
+        while state == b"head":
+            if event == b"macro_data":
                 # happily ignores "table of contents" or other requests
                 pass
             state, event, value = (yield)
         
         # Title
         title = None
-        while state in ("title", "title_body", "title_block",
-                             "title_value", "title_tag"):           
-            if state == "title":
-                if event == "start":
+        while state in (b"title", b"title_body", b"title_block",
+                             b"title_value", b"title_tag"):           
+            if state == b"title":
+                if event is start:
                     title = []
-                if event == "data":
+                if event is data:
                     title.append(value)
-                if event == "end":
+                if event is end:
                     title_infos["Title"] = " ".join(title)
-            if event == "macro_data":
+            if event == b"macro_data":
                 # TODO
                 continue
             state, event, value = (yield)
@@ -57,53 +60,53 @@ def sink(metadata, file_obj):
                 write(title_infos["Title"])
                 write("</h1>")
 
-        while state in ("cast", "cast_body", "cast_block",
-                             "actor_des", "actor_dec"):
+        while state in (b"cast", b"cast_body", b"cast_block",
+                             b"actor_des", b"actor_dec"):
             state, event, value = (yield)
             # TODO
 
         # main
         start_switch = {
-            "block": "<p class='DML_block'>",
-            "actor": "<p class='DML_dialog_line'><span class='DML_actor'>",
-            "dialog": "<span class='DML_dialog'>",
-            "inline_dir": "<span class='DML_stage_direction'>",
-            "act": "<h3 class='DML_act'>",
-            "scene": "<h4 class='DML_scene'>"}
+            b"block": "<p class='DML_block'>",
+            b"actor": "<p class='DML_dialog_line'><span class='DML_actor'>",
+            b"dialog": "<span class='DML_dialog'>",
+            b"inline_dir": "<span class='DML_stage_direction'>",
+            b"act": "<h3 class='DML_act'>",
+            b"scene": "<h4 class='DML_scene'>"}
         end_switch = {
-            "block": "</p>\n",
-            "actor": "</span>",
-            "dialog": "</span></p>\n",
-            "inline_dir": "</span>",
-            "act": "</h3>\n",
-            "scene": "</h4>"}
+            b"block": "</p>\n",
+            b"actor": "</span>",
+            b"dialog": "</span></p>\n",
+            b"inline_dir": "</span>",
+            b"act": "</h3>\n",
+            b"scene": "</h4>"}
         # if this doesn't make a convincing case for a switch statement in python
         # then I don't know one
-        while state != "end":
-            if event == "start":
+        while state is not end:
+            if event is start:
                 try:
                     write(start_switch[state])
                 except KeyError:
                     state, event, value = (yield)
                     continue
 
-            elif event == "end":
+            elif event is end:
                 try:
                     write(end_switch[state])
                 except KeyError:
                     state, event, value = (yield)
                     continue
                     
-            elif event == "data":
+            elif event is data:
                 if value == "\n":
                     write("<br />")
                 else:
                     write(" ")
-                    write(value.encode("utf-8"))
+                    write(value.encode(b"utf-8"))
             state, event, value = (yield)
         
         write("\n</body>")
-        while state == "end":
+        while state == b"end":
             state, event, value = (yield)
 
     except GeneratorExit:

@@ -6,6 +6,8 @@ import pango
 import pangocairo
 import cairo
 
+from src.hyphen import hyphenate
+
 NAME = "pdf"
 EXTENSION = "pdf"
 DESCRIPTION = "generates PDF output"
@@ -131,11 +133,11 @@ def sink(metadata, file_obj):
         def __init__(self, meta_infos, file_obj):
             self.page_count = 1
             self.meta_infos = meta_infos
-            self.pdf_surface = pdf_surface = cairo.PDFSurface(file_obj,
-                   paper_sizes[meta_infos["paper_size"]][0] * dpi_factor,
-                   paper_sizes[meta_infos["paper_size"]][1] * dpi_factor)
+            self.width = paper_sizes[meta_infos["paper_size"]][0] * dpi_factor
+            self.height = paper_sizes[meta_infos["paper_size"]][1] * dpi_factor
+            self.pdf_surface = pdf_surface = cairo.PDFSurface(file_obj,self.width, self.height)
             self.current_page_left = False
-            one_nineth = paper_sizes[meta_infos["paper_size"]][0] / 9 * dpi_factor, paper_sizes[meta_infos["paper_size"]][1] / 9 * dpi_factor
+            one_nineth = self.width / 9, self.height / 9
             if meta_infos["two_page"]:
                 self.satzspiegel = one_nineth[1], one_nineth[0], one_nineth[1] * 2, one_nineth[0] * 2
             else:
@@ -150,6 +152,10 @@ def sink(metadata, file_obj):
             self.line_height = temp_layout.height
             self._maximal_lines = int(one_nineth[1] * 6 / self.line_height * 2.54)
             self.used_height = 0
+            if meta_infos["language"] is not None:
+                self.hyphenator = hyphen.hyphenate(meta_infos["language"])
+            else:
+                self.hyphenator = None
             
         def create_layout(self):
             satzspiegel = self.satzspiegel
@@ -178,11 +184,11 @@ def sink(metadata, file_obj):
             if self.current_page_left:
                 pango_layout.set_alignment(pango.ALIGN_LEFT)
                 cairo_context.move_to(self.satzspiegel[3],
-                                      paper_sizes[meta_infos["paper_size"]][1] * dpi_factor - self.satzspiegel[2] + self.line_height * 2)
+                                      self.height - self.satzspiegel[2] + self.line_height * 2)
             else:
                 pango_layout.set_alignment(pango.ALIGN_RIGHT)
-                cairo_context.move_to(paper_sizes[meta_infos["paper_size"]][0] * dpi_factor - self.satzspiegel[3] - width / pango.SCALE,
-                                      paper_sizes[meta_infos["paper_size"]][1] * dpi_factor - self.satzspiegel[2] + self.line_height * 2)
+                cairo_context.move_to(self.width - self.satzspiegel[3] - width / pango.SCALE,
+                                      self.height - self.satzspiegel[2] + self.line_height * 2)
             pangocairo_context.show_layout(pango_layout)
         
         def show_page(self, show_page_number=True):
@@ -205,7 +211,10 @@ def sink(metadata, file_obj):
             
     print("starting sink '{0}' ...".format(NAME))
     try:
-        meta_infos = {"paper_size": "a4", "two_page": True, "table_of_contents": False}
+        meta_infos = {"paper_size": "a4",
+                      "two_page": True,
+                      "table_of_contents": False,
+                      "language": None}
         
         state, event, value = (yield)
                 
@@ -216,8 +225,8 @@ def sink(metadata, file_obj):
             state, event, value = (yield)
         
         # Header
-        while state == "head":
-            if event == "macro_data":
+        while state == b"head":
+            if event == b"macro_data":
                 option, macro_value = value
                 meta_infos[option] = macro_value
             state, event, value = (yield)
@@ -229,39 +238,39 @@ def sink(metadata, file_obj):
         attribs = {"title": "", "author": "", "blocks": []}
         current_tag = ""
         while state in ("title", "title_body", "title_block", "title_value", "title_tag"):
-            if state == "title":
-                if event == "start":
+            if state == b"title":
+                if event == b"start":
                     title = []
-                elif event == "data":
+                elif event == b"data":
                     title.append(value)
-                elif event == "end":
+                elif event == b"end":
                     attribs["title"] = " ".join(title)
                     del title
-            elif state == "title_tag":
-                if event == "start":
+            elif state == b"title_tag":
+                if event == b"start":
                     tag = []
-                elif event == "data":
+                elif event == b"data":
                     tag.append(value)
-                elif event == "end":
+                elif event == b"end":
                     current_tag = " ".join(tag)
-            elif state == "title_value":
-                if event == "start":
+            elif state == b"title_value":
+                if event == b"start":
                     val = []
-                elif event == "data":
+                elif event == b"data":
                     val.append(value)
-                elif event == "end":
+                elif event == b"end":
                     attribs[current_tag] = " ".join(val)
                     del val
-            elif state == "title_block":
-                if event == "start":
+            elif state == b"title_block":
+                if event == b"start":
                     block = []
-                elif event == "data":
+                elif event == b"data":
                     block.append(value)
-                elif event == "end":
+                elif event == b"end":
                     attribs["blocks"].append(" ".join(block))
                     del block
                     
-            elif event == "macro_data":
+            elif event == b"macro_data":
                 # TODO
                 continue
             state, event, value = (yield)
@@ -277,68 +286,68 @@ def sink(metadata, file_obj):
                 title_layout.finish()
                 page_manager.show_page(show_page_number=False)
         
-        while state in ("cast", "cast_body", "cast_block",
-                             "actor_des", "actor_dec"):
+        while state in (b"cast", b"cast_body", b"cast_block",
+                             b"actor_des", b"actor_dec"):
             state, event, value = (yield)
             # TODO
         
         current_dialog_line = ""
-        while state != "end":
-            if state == "act":                
-                if event == "start":
+        while state != b"end":
+            if state == b"act":                
+                if event == b"start":
                     act = []
-                elif event == "data":
+                elif event == b"data":
                     act.append(value)
-                elif event == "end":
+                elif event == b"end":
                     layout = page_manager.create_layout()
                     layout.alignment = pango.ALIGN_CENTER
                     layout.set_markup("<span size='x-large'>" + " ".join(act) + "</span>")
                     layout.finish(break_after=False)
-            elif state == "scene":                
-                if event == "start":
+            elif state == b"scene":                
+                if event == b"start":
                     scene = []
-                elif event == "data":
+                elif event == b"data":
                     scene.append(value)
-                elif event == "end":
+                elif event == b"end":
                     layout = page_manager.create_layout()
                     layout.alignment = pango.ALIGN_CENTER
                     layout.set_markup("\n<span size='large'>" + " ".join(scene) + "</span>")
                     layout.finish(break_after=False)
-            elif state == "block":
-                if event == "start":
+            elif state == b"block":
+                if event == b"start":
                     layout = page_manager.create_layout()
-                elif event == "data":
+                elif event == b"data":
                     layout.add_markup("<span style='oblique'>" + value + "</span>")
-                elif event == "end":
+                elif event == b"end":
                     layout.finish()
-            elif state == "empty_line":
-                if event == "end":
+            elif state == b"empty_line":
+                if event == b"end":
                     layout = page_manager.create_layout()
                     layout.text = ""
                     layout.finish()
-            elif state == "actor":
-                if event == "start":
+            elif state == b"actor":
+                if event == b"start":
                     dialog_layout = page_manager.create_layout()
                     dialog_layout.indent = -20
-                elif event == "data":
+                elif event == b"data":
                     dialog_layout.add_markup("<span weight='bold'>" + value + "</span> ")
-                elif event == "end":
+                elif event == b"end":
                     pass
-            elif state == "dialog":
-                if event == "start":
+            elif state == b"dialog":
+                if event == b"start":
                     #dialog = []
                     pass
-                elif event == "data":
+                elif event == b"data":
                     #dialog.append(value)
                     dialog_layout.add_markup(value)
-                elif event == "end":
+                elif event == b"end":
                     dialog_layout.finish()
-            elif state == "inline_dir":
-                if event == "start":
+            elif state == b"inline_dir":
+                if event == b"start":
                     pass
-                elif event == "data":
+                elif event == b"data":
                      dialog_layout.add_markup("<span style='oblique'>" + value + "</span>")
-                elif event == "end":
+                elif event == b"end":
                     pass
                     
             state, event, value = (yield)

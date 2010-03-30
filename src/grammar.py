@@ -16,108 +16,108 @@ from __future__ import print_function
 from __future__ import unicode_literals
 
 states = {
-    "start": ([], {
-        "new_paragraph": "head",
-        "macro_data": "head",
-        "cmd_line_option": "start",
-        "act_del": "act",
-        "scene_del": "scene",
-        "cast_del": "cast",
-        "title_del": "title",
-        "end": "end"}),
-    "title": ([], {
-        "data": "title",
-        "title_del": "title_body"}),
-    "cast": ([], {
-        "data": "cast",
-        "cast_del": "cast_body"}),
-    "act": ([], {
-        "data": "act",
-        "act_del": "body"}),
-    "scene": ([], {
-        "data": "scene",
-        "scene_del": "body"}),
+    b"start": ([], {
+        b"new_paragraph": b"head",
+        b"macro_data": b"head",
+        b"cmd_line_option": b"start",
+        b"act_del": b"act",
+        b"scene_del": b"scene",
+        b"cast_del": b"cast",
+        b"title_del": b"title",
+        b"end": b"end"}),
+    b"title": ([], {
+        b"data": b"title",
+        b"title_del": b"title_body"}),
+    b"cast": ([], {
+        b"data": b"cast",
+        b"cast_del": b"cast_body"}),
+    b"act": ([], {
+        b"data": b"act",
+        b"act_del": b"body"}),
+    b"scene": ([], {
+        b"data": b"scene",
+        b"scene_del": b"body"}),
 
-    "actor": ([], {
-        "data": "actor",
-        "key_del": "dialog"}),
-    "inline_dir": ([], {
-        "data": "inline_dir",
-        "inline_dir_del": "dialog"}),
-    "dialog": (["inline_dir"], {
-        "data": "dialog",
-        "key_del": "actor",
-        "inline_dir_del": "inline_dir",
-        "new_paragraph": "empty_line",
-        "end": "end"}),
-    "block": ([], {
-        "data": "block",
-        "new_paragraph": "empty_line",
-        "end": "end"}),
-    "body": (["actor", "dialog", "block", "empty_line"], {
-        "key_del": "actor",
-        "block_start": "block",
-        "act_del": "act",
-        "scene_del": "scene",
-        "new_paragraph": "empty_line",
-        "end": "end"}),
-    "empty_line": ([], {
-        "key_del": "actor",
-        "block_start": "block",
-        "act_del": "act",
-        "scene_del": "scene",
-        "new_paragraph": "empty_line",
-        "end": "end"}),
-    "title_tag": ([], {
-        "data": "title_tag",
-        "key_del": "title_value"}),
-    "title_value": ([], {
-        "data": "title_value",
-        "key_del": "title_tag",
-        "new_paragraph": "title_body",
-        "end": "end"}),
-    "title_block": ([], {
-        "data": "title_block",
-        "new_paragraph": "title_body",
-        "end": "end"}),
-    "title_body": (["title_tag", "title_value", "title_block"], {
-        "key_del": "title_tag",
-        "block_start": "title_block",
-        "act_del": "act",
-        "scene_del": "scene",
-        "cast_del": "cast",
-        "new_paragraph": "title_body",
-        "end": "end"}),
+    b"actor": ([], {
+        b"data": b"actor",
+        b"key_del": b"dialog"}),
+    b"inline_dir": ([], {
+        b"data": b"inline_dir",
+        b"inline_dir_del": b"dialog"}),
+    b"dialog": ([b"inline_dir"], {
+        b"data": b"dialog",
+        b"key_del": b"actor",
+        b"inline_dir_del": b"inline_dir",
+        b"new_paragraph": b"empty_line",
+        b"end": b"end"}),
+    b"block": ([], {
+        b"data": b"block",
+        b"new_paragraph": b"empty_line",
+        b"end": b"end"}),
+    b"body": ([b"actor", b"dialog", b"block", b"empty_line"], {
+        b"key_del": b"actor",
+        b"block_start": b"block",
+        b"act_del": b"act",
+        b"scene_del": b"scene",
+        b"new_paragraph": b"empty_line",
+        b"end": b"end"}),
+    b"empty_line": ([], {
+        b"key_del": b"actor",
+        b"block_start": b"block",
+        b"act_del": b"act",
+        b"scene_del": b"scene",
+        b"new_paragraph": b"empty_line",
+        b"end": b"end"}),
+    b"title_tag": ([], {
+        b"data": b"title_tag",
+        b"key_del": b"title_value"}),
+    b"title_value": ([], {
+        b"data": b"title_value",
+        b"key_del": b"title_tag",
+        b"new_paragraph": b"title_body",
+        b"end": b"end"}),
+    b"title_block": ([], {
+        b"data": b"title_block",
+        b"new_paragraph": b"title_body",
+        b"end": b"end"}),
+    b"title_body": ([b"title_tag", b"title_value", b"title_block"], {
+        b"key_del": b"title_tag",
+        b"block_start": b"title_block",
+        b"act_del": b"act",
+        b"scene_del": b"scene",
+        b"cast_del": b"cast",
+        b"new_paragraph": b"title_body",
+        b"end": b"end"}),
 
-    "actor_dec": ([], {
-        "data": "actor_dec",
-        "key_del": "cast_body"}),
-    "actor_des": ([], {
-        "data": "actor_des",
-        "key_del": "actor_dec",
-        "new_paragraph": "cast_body",
-        "end": "end"}),
-    "cast_block": ([], {
-        "data": "cast_block",
-        "new_paragraph": "cast_body",
-        "end": "end"}),
-    "cast_body": (["actor_dec", "actor_des", "cast_block"], {
-        "key_del": "actor_dec",
-        "block_start": "cast_block",
-        "act_del": "act",
-        "scene_del": "scene",
-        "new_paragraph": "cast_body",
-        "end": "end"}),
+    b"actor_dec": ([], {
+        b"data": b"actor_dec",
+        b"key_del": b"cast_body"}),
+    b"actor_des": ([], {
+        b"data": b"actor_des",
+        b"key_del": b"actor_dec",
+        b"new_paragraph": b"cast_body",
+        b"end": b"end"}),
+    b"cast_block": ([], {
+        b"data": b"cast_block",
+        b"new_paragraph": b"cast_body",
+        b"end": b"end"}),
+    b"cast_body": ([b"actor_dec", b"actor_des", b"cast_block"], {
+        b"key_del": b"actor_dec",
+        b"block_start": b"cast_block",
+        b"act_del": b"act",
+        b"scene_del": b"scene",
+        b"new_paragraph": b"cast_body",
+        b"end": b"end"}),
 
-    "head": ([], {
-        "act_del": "act",
-        "scene_del": "scene",
-        "cast_del": "cast",
-        "title_del": "title",
-        "new_paragraph": "head",
-        "macro_data": "head",
-        "end": "end"}),
+    b"head": ([], {
+        b"act_del": b"act",
+        b"scene_del": b"scene",
+        b"cast_del": b"cast",
+        b"title_del": b"title",
+        b"new_paragraph": b"head",
+        b"macro_data": b"head",
+        b"end": b"end"}),
         
-    "end": ([], {
-        "end": "end"}),
+    b"end": ([], {
+        b"end": b"end"}),
 }

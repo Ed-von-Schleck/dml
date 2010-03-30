@@ -38,7 +38,7 @@ def broadcast(metadata, sinks):
     state, event, token
     """
     state = "start"
-    
+    data = intern(b"data")
     try:
         while True:
             event, value = (yield)
@@ -55,19 +55,19 @@ def broadcast(metadata, sinks):
 
                     if last_state != state:
                         if state in states[last_state][0]:
-                            # the new state is child the last one
-                            send((state, "start", None))
+                            # the new state is child of the last one
+                            send((state, b"start", None))
                         elif last_state in states[state][0]:
                             # the new state is parent of the last one
-                            send((last_state, "end", None))
+                            send((last_state, b"end", None))
                         else:
-                            send((last_state, "end", None))
-                            send((state, "start", None))
+                            send((last_state, b"end", None))
+                            send((state, b"start", None))
                         
-                    if event == "data":
-                        send((state, "data", value))
-                    elif event == "macro_data":
-                        send((state, "macro_data", value))
+                    if event is data:
+                        send((state, b"data", value))
+                    elif event == b"macro_data":
+                        send((state, b"macro_data", value))
                     
                 # if the sink or any of the filters stops, we stop the whole chain
                 except StopIteration:

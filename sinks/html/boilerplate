@@ -26,7 +26,7 @@ h2#DML_cast {
 h3.DML_act {
     text-align: center;
     clear: both;
-    padding: 1em;
+    padding: 2em 0 1em 0;
     margin: 0;
     page-break-before:always;
     page-break-after: avoid;
@@ -35,7 +35,7 @@ h3.DML_act {
 h4.DML_scene {
     text-align: center;
     clear: both;
-    padding: 1em;
+    padding: 2em 0 1em 0;
     margin: 0;
     page-break-after: avoid;
 }
