@@ -9,10 +9,6 @@ import cairo
 from src.hyphen import hyphenate
 from src.registry import sinks, Sink
 
-NAME = "pdf"
-EXTENSION = "pdf"
-DESCRIPTION = "generates PDF output"
-
 def sink(metadata, file_obj):
     dpi_factor = 72 / 25.4
         
@@ -210,7 +206,7 @@ def sink(metadata, file_obj):
             return self._maximal_height - self.used_height
 
             
-    print("starting sink '{0}' ...".format(NAME))
+    print("starting sink 'pdf' ...")
     try:
         meta_infos = {"paper_size": "a4",
                       "two_page": True,
@@ -359,6 +355,6 @@ def sink(metadata, file_obj):
     except GeneratorExit:
         pass
     finally:
-        print("stopped sink '{0}'".format(NAME))
+        print("stopped sink 'pdf'")
 
 sinks["pdf"] = Sink("pdf", "generates PDF output", sink)

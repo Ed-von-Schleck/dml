@@ -17,7 +17,7 @@ Besides the main loop, this is really the heart of dml. It
 from __future__ import print_function
 from __future__ import unicode_literals
 
-from shutil import copyfile, move
+from shutil import move
 import os.path
 
 from src.grammar import states
@@ -48,37 +48,29 @@ def broadcast(metadata, sinks):
             except KeyError:
                 raise DMLStateTransitionError(state, event)
             for sink in sinks:
-                if sink.closed:
-                    continue
-                try:
-                    send = sink.cor.send
-
-                    if last_state is not state:
-                        if state in states[last_state][0]:
-                            # the new state is child of the last one
-                            send((state, b"start", None))
-                        elif last_state in states[state][0]:
-                            # the new state is parent of the last one
-                            send((last_state, b"end", None))
-                        else:
-                            send((last_state, b"end", None))
-                            send((state, b"start", None))
-                        
-                    if event is data:
-                        send((state, b"data", value))
-                    elif event == b"macro_data":
-                        send((state, b"macro_data", value))
+                send = sink.send
+                
+                if event is data:
+                    send((state, b"data", value))
                     
-                # if the sink or any of the filters stops, we stop the whole chain
-                except StopIteration:
-                    sink.cor.close()
-                    sink._replace(closed=True)
+                elif last_state is not state:
+                    if state in states[last_state][0]:
+                        # the new state is child of the last one
+                        send((state, b"start", None))
+                    elif last_state in states[state][0]:
+                        # the new state is parent of the last one
+                        send((last_state, b"end", None))
+                    else:
+                        send((last_state, b"end", None))
+                        send((state, b"start", None))
+                
+                elif event == b"macro_data":
+                    send((state, b"macro_data", value))
             
     except GeneratorExit:
         pass
     finally:
         for sink in sinks:
-            tmpfilename = sink.tmpfile.name
             sink.tmpfile.close()
             filename = os.path.join(metadata.working_dir, metadata.name + "." + sink.meta.extension)
             move(sink.tmpfile.name, filename)

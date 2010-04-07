@@ -7,12 +7,11 @@ import os, os.path
 from collections import namedtuple
 from tempfile import NamedTemporaryFile
 import io
-import codecs
 
 from src.dmlexceptions import DMLError
 from src.broadcast import broadcast
 from src.lex import DmlLex
-from sinks import *
+from sinks import *     # so that they register themselves
 import src.registry
 
 class NullDevice():
@@ -20,7 +19,7 @@ class NullDevice():
     def write(self, dummy_out):
         pass
         
-MySink = namedtuple("MySink", "meta cor tmpfile closed")
+MySink = namedtuple("MySink", "meta send tmpfile")
 Metadata = namedtuple("Metadata", "filepath name filename working_dir")
 
 def main(dml_file, options):
@@ -38,7 +37,7 @@ def main(dml_file, options):
             tmpfile = NamedTemporaryFile(mode="w", delete=False)
             cor = sink.coroutine(metadata, tmpfile)
             cor.next()
-            mysinks.append(MySink(sink, cor, tmpfile, False))
+            mysinks.append(MySink(sink, cor.send, tmpfile))
     
     broadcaster = broadcast(metadata, mysinks)
     broadcaster.next()
@@ -63,6 +62,5 @@ def main(dml_file, options):
         print (b"*" * 80)
         sys.exit(1)
     finally:
-        if dml:
-            dml.close()
-            print(b"closed", dml_file)
+        dml.close()
+        print(b"closed", dml_file)

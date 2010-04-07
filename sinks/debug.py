@@ -9,16 +9,10 @@ that come with them neatly in a table.
 from __future__ import print_function
 from __future__ import unicode_literals
 
-import os.path
-
 from src.registry import sinks, Sink
 
-NAME = "debug"
-EXTENSION = "dbg"
-DESCRIPTION = "generates debug output"
-
 def sink(metadata, file_obj):
-    print("starting sink '{0}' ...".format(NAME))
+    print("starting sink 'debug' ...")
     try:
         count = 0
         header = b"\n{0: ^19}|{1: ^20}|{2: ^19}\n".format("state", "event", "token")
@@ -38,6 +32,6 @@ def sink(metadata, file_obj):
     except GeneratorExit:
         pass
     finally:
-        print("stopped sink '{0}'".format(NAME))
+        print("stopped sink 'debug'")
 
 sinks["debug"] = Sink("dbg", "generates debugging output", sink)

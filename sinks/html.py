@@ -5,18 +5,13 @@ from __future__ import unicode_literals
 from shutil import copyfileobj
 from src.registry import sinks, Sink
 
-NAME = "html"
-EXTENSION = "html"
-DESCRIPTION = "generates HTML output"
-
 def sink(metadata, file_obj):
-    print(b"starting sink '{0}' ...".format(NAME))
+    print(b"starting sink 'html' ...")
     try:
         with open(b"sinks/html/boilerplate") as boilerplate:
             copyfileobj(boilerplate, file_obj)
         write = file_obj.write
         
-        table_of_contents = False
         title_infos = {}
         
         state, event, value = (yield)
@@ -111,6 +106,6 @@ def sink(metadata, file_obj):
     except GeneratorExit:
         pass
     finally:
-        print("stopped sink '{0}'".format(NAME))
+        print("stopped sink 'html'")
 
 sinks["html"] = Sink("html", "generates HTML output", sink)

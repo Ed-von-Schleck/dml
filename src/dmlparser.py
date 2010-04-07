@@ -10,9 +10,6 @@ contextmanager for parser coroutines.
 from __future__ import unicode_literals
 
 from contextlib import contextmanager
-from itertools import count
-
-from src.dmlexceptions import DMLSyntaxError
 
 def parser_entry(send):
     """
