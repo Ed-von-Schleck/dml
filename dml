@@ -27,7 +27,8 @@ import sys
 import os.path
 from optparse import OptionParser
 
-import sinks
+from sinks import *
+from src.registry import sinks
 
 if __name__ == '__main__':
     try:
@@ -37,11 +38,11 @@ if __name__ == '__main__':
         pass
     option_parser = OptionParser(usage="dml [options] FILE")
     add_option = option_parser.add_option
-    sink_mods = [sinks.__dict__[mod] for mod in sinks.__all__]
-    for mod in sink_mods:
-        add_option("--" + mod.NAME,
-                   dest=mod.NAME, action="store_true",
-                   default=False, help=mod.DESCRIPTION)
+    #sink_mods = [sinks.__dict__[mod] for mod in sinks.__all__]
+    for sinkname, sink in sinks.items():
+        add_option("--" + sinkname,
+                   dest=sinkname, action="store_true",
+                   default=False, help=sink.description)
     add_option("-q", "--quiet", action="store_false", dest="verbose",
                default=True, help="don't print status messages to stdout")
     (options, args) = option_parser.parse_args()

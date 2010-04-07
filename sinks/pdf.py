@@ -7,6 +7,7 @@ import pangocairo
 import cairo
 
 from src.hyphen import hyphenate
+from src.registry import sinks, Sink
 
 NAME = "pdf"
 EXTENSION = "pdf"
@@ -359,3 +360,5 @@ def sink(metadata, file_obj):
         pass
     finally:
         print("stopped sink '{0}'".format(NAME))
+
+sinks["pdf"] = Sink("pdf", "generates PDF output", sink)

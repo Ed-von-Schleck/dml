@@ -12,14 +12,15 @@ import codecs
 from src.dmlexceptions import DMLError
 from src.broadcast import broadcast
 from src.lex import DmlLex
-import sinks
+from sinks import *
+import src.registry
 
 class NullDevice():
     "Dummy output device if option '-q' is selected"
     def write(self, dummy_out):
         pass
         
-MySink = namedtuple("MySink", "mod cor tmpfile closed")
+MySink = namedtuple("MySink", "meta cor tmpfile closed")
 Metadata = namedtuple("Metadata", "filepath name filename working_dir")
 
 def main(dml_file, options):
@@ -32,28 +33,23 @@ def main(dml_file, options):
         
     # This won't win a beauty contest, but seems robust.
     mysinks = []
-    sink_mods = [sinks.__dict__[mod] for mod in sinks.__all__]
-    for mod in sink_mods:
-        if options.__dict__[mod.NAME]:
+    for sinkname, sink in src.registry.sinks.items():
+        if options.__dict__[sinkname]:
             tmpfile = NamedTemporaryFile(mode="w", delete=False)
-            cor = mod.sink(metadata, tmpfile)
+            cor = sink.coroutine(metadata, tmpfile)
             cor.next()
-            mysinks.append(MySink(mod, cor, tmpfile, False))
+            mysinks.append(MySink(sink, cor, tmpfile, False))
     
     broadcaster = broadcast(metadata, mysinks)
     broadcaster.next()
 
     try:
-        try:
-            dml = io.open(dml_file, "rU", encoding="utf-8")
-            print(b"opening", dml_file, b"...")
-            lexer = DmlLex(dml, filename=dml_file)
-            lexer.run(broadcaster, metadata)
-        except IOError:
-            pass
-        finally:
-            dml.close()
-            print(b"closed", dml_file)
+        dml = io.open(dml_file, "rU", encoding="utf-8")
+        print(b"opening", dml_file, b"...")
+        lexer = DmlLex(dml, filename=dml_file)
+        lexer.run(broadcaster, metadata)
+    except IOError:
+        pass
     except DMLError as dml_error:
         import linecache
         print (b"*" * 80)
@@ -66,3 +62,7 @@ def main(dml_file, options):
         print(b" " * (lexer.pos - 1) + b"^")
         print (b"*" * 80)
         sys.exit(1)
+    finally:
+        if dml:
+            dml.close()
+            print(b"closed", dml_file)

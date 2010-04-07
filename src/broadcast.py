@@ -80,7 +80,7 @@ def broadcast(metadata, sinks):
         for sink in sinks:
             tmpfilename = sink.tmpfile.name
             sink.tmpfile.close()
-            filename = os.path.join(metadata.working_dir, metadata.name + "." + sink.mod.EXTENSION)
+            filename = os.path.join(metadata.working_dir, metadata.name + "." + sink.meta.extension)
             move(sink.tmpfile.name, filename)
             print("written", filename)
             

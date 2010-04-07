@@ -11,6 +11,7 @@ for those delegates.
 from __future__ import unicode_literals
 
 from contextlib import contextmanager
+from itertools import count
 
 from src.dmlexceptions import DMLSyntaxError
 
@@ -91,71 +92,24 @@ def title_cast_or_act(broadcaster):
     """
     parses a title, cast or act declaration
     
-    It gets called when a '=' is seen. It then lookes if there are more of
-    them, then it wants some data and afterwards the same number of '=' again
-    or it gets angry (raises DMLSyntaxError)
+    It gets called when a '=' is seen. It then looks if there are more of
+    them, then it wants some data and afterwards the same number of '=' again.
     """
-    token = (yield)
+    
     send = broadcaster.send
-    if token != "=":
-        send((b"title_del", None))
-        while True:
-            send((b"data", token))
-            token = (yield)
-            if token == "=":
-                send((b"title_del", None))
-                break
-    else:
+    delimiters = [b"title_del", b"cast_del", b"act_del", b"scene_del"]
+    i = 0
+    token = (yield)
+    while token == "=":
+        i += 1
         token = (yield)
-        if token != "=":
-            send((b"cast_del", None))
-            while True:
-                send((b"data", token))
-                token = (yield)
-                if token != "=":
-                    continue
-                token = (yield)
-                if token == "=":
-                    send((b"cast_del", None))
-                    break
-                raise DMLSyntaxError(token, "=")
-        else:
-            token = (yield)
-            if token != "=":
-                send((b"act_del", None))
-                while True:
-                    send((b"data", token))
-                    token = (yield)
-                    if token != "=":
-                        continue
-                    token = (yield)
-                    if token == "=":
-                        token = (yield)
-                        if token == "=":
-                            send((b"act_del", None))
-                            break
-                        raise DMLSyntaxError(token, "=")
-                    raise DMLSyntaxError(token, "==")
-            else:
-                token = (yield)
-                if token != "=":
-                    send((b"scene_del", None))
-                    while True:
-                        send((b"data", token))
-                        token = (yield)
-                        if token != "=":
-                            continue
-                        token = (yield)
-                        if token == "=":
-                            token = (yield)
-                            if token == "=":
-                                token = (yield)
-                                if token == "=":
-                                    send((b"scene_del", None))
-                                    break
-                                raise DMLSyntaxError(token, "=")
-                            raise DMLSyntaxError(token, "==")
-                        raise DMLSyntaxError(token, "===")
+    send((delimiters[i], None))
+    while token != "=":
+        send((b"data", token))
+        token = (yield)
+    send((delimiters[i], None))
+    for j in xrange(i):
+        token = (yield)
 
 @contextmanager
 def parser_manager(coroutine, *args, **kwargs):

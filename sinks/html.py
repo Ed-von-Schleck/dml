@@ -3,6 +3,7 @@ from __future__ import print_function
 from __future__ import unicode_literals
 
 from shutil import copyfileobj
+from src.registry import sinks, Sink
 
 NAME = "html"
 EXTENSION = "html"
@@ -111,3 +112,5 @@ def sink(metadata, file_obj):
         pass
     finally:
         print("stopped sink '{0}'".format(NAME))
+
+sinks["html"] = Sink("html", "generates HTML output", sink)

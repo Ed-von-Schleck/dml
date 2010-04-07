@@ -11,6 +11,8 @@ from __future__ import unicode_literals
 
 import os.path
 
+from src.registry import sinks, Sink
+
 NAME = "debug"
 EXTENSION = "dbg"
 DESCRIPTION = "generates debug output"
@@ -37,3 +39,5 @@ def sink(metadata, file_obj):
         pass
     finally:
         print("stopped sink '{0}'".format(NAME))
+
+sinks["debug"] = Sink("dbg", "generates debugging output", sink)
