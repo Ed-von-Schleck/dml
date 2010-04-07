@@ -19,18 +19,19 @@ def sink(metadata, file_obj):
     print("starting sink '{0}' ...".format(NAME))
     try:
         count = 0
-        header = "\n{0: ^19}|{1: ^20}|{2: ^19}\n".format("state", "event", "token")
+        header = b"\n{0: ^19}|{1: ^20}|{2: ^19}\n".format("state", "event", "token")
         header += "-" * 79 + "\n"
         write = file_obj.write
+        write(header)
         while True:
             state, event, value = (yield)
             value_name = "" if value is None else value
-            out = "{0:19}| {1:19}| {2:18}\n".format(state, event, value_name)
+            out = b"{0:19}| {1:19}| {2:18}\n".format(state, event, value_name.encode("utf-8"))
             if count == 40:
                 write(header)
                 count = 0
             count += 1
-            write(out.encode("utf-8"))
+            write(out)
 
     except GeneratorExit:
         pass

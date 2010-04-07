@@ -38,9 +38,12 @@ def parser_entry(broadcaster):
                     while token == "\n":
                         token = (yield)
                 if token == "*":            # This delimits key (actor or tag or sth.).
-                    with parser_manager(key, broadcaster) as key_parser:
-                        while True:
-                            key_parser((yield))    # The key parser return for token ':'.
+                    send((b"key_del", None))
+                    token = (yield)
+                    while token != "*":
+                        send((b"data", token))
+                        token = (yield)
+                    send((b"key_del", None))
                 elif token == "=":          # This is a title, cast or act.
                     with parser_manager(title_cast_or_act, broadcaster) as tca:
                         while True:
@@ -52,9 +55,12 @@ def parser_entry(broadcaster):
                     send((b"data", token))
                         
             elif token == "*":
-                with parser_manager(key, broadcaster) as key_parser:
-                    while True:
-                        key_parser((yield))
+                send((b"key_del", None))
+                token = (yield)
+                while token != "*":
+                    send((b"data", token))
+                    token = (yield)
+                send((b"key_del", None))
                         
             elif token == "=":
                 with parser_manager(title_cast_or_act, broadcaster) as tca:
@@ -150,22 +156,7 @@ def title_cast_or_act(broadcaster):
                                 raise DMLSyntaxError(token, "=")
                             raise DMLSyntaxError(token, "==")
                         raise DMLSyntaxError(token, "===")
-def key(broadcaster):
-    """
-    key parser
-    
-    This little critter gets called when a '*' is seen. It sends data until
-    a the next '*' is encountered.
-    """
-    send = broadcaster.send
-    send((b"key_del", None))
-    while True:
-        token = (yield)
-        if token == "*":
-            send((b"key_del", None))
-            break
-        send((b"data", token))
-        
+
 @contextmanager
 def parser_manager(coroutine, *args, **kwargs):
     """

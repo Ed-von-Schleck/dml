@@ -7,9 +7,9 @@ of the dml-parsing happening in three steps: First the lexer, forming tokens
 and sorting out comments and macros, then parser-entry and friends, and then
 this grammar here, which is more high level. Theoretically, all syntactical
 parsing could be done here, but having things like * and = only count as
-delimiters after newlines makes the parser more relaxed (won't complain if *
-and = is used in blocks, for an instance). Having that implemented here would
-seriously harm readibility of this file.
+delimiters after newlines makes the parser more relaxed (e.g. won't complain if
+* and = is used in blocks). Having that implemented here would probably harm
+readibility of this file.
 """
 
 from __future__ import print_function

@@ -9,9 +9,9 @@ EXTENSION = "html"
 DESCRIPTION = "generates HTML output"
 
 def sink(metadata, file_obj):
-    print("starting sink '{0}' ...".format(NAME))
+    print(b"starting sink '{0}' ...".format(NAME))
     try:
-        with open("sinks/html/boilerplate") as boilerplate:
+        with open(b"sinks/html/boilerplate") as boilerplate:
             copyfileobj(boilerplate, file_obj)
         write = file_obj.write
         
@@ -38,8 +38,7 @@ def sink(metadata, file_obj):
         
         # Title
         title = None
-        while state in (b"title", b"title_body", b"title_block",
-                             b"title_value", b"title_tag"):           
+        while state in (b"title", b"title_body", b"title_block", b"title_value", b"title_tag"):           
             if state == b"title":
                 if event is start:
                     title = []
@@ -60,26 +59,25 @@ def sink(metadata, file_obj):
                 write(title_infos["Title"])
                 write("</h1>")
 
-        while state in (b"cast", b"cast_body", b"cast_block",
-                             b"actor_des", b"actor_dec"):
+        while state in (b"cast", b"cast_body", b"cast_block", b"actor_des", b"actor_dec"):
             state, event, value = (yield)
             # TODO
 
         # main
         start_switch = {
-            b"block": "<p class='DML_block'>",
-            b"actor": "<p class='DML_dialog_line'><span class='DML_actor'>",
-            b"dialog": "<span class='DML_dialog'>",
-            b"inline_dir": "<span class='DML_stage_direction'>",
-            b"act": "<h3 class='DML_act'>",
-            b"scene": "<h4 class='DML_scene'>"}
+            b"block": b"<p class='DML_block'>",
+            b"actor": b"<p class='DML_dialog_line'><span class='DML_actor'>",
+            b"dialog": b"<span class='DML_dialog'>",
+            b"inline_dir": b"<span class='DML_stage_direction'>",
+            b"act": b"<h3 class='DML_act'>",
+            b"scene": b"<h4 class='DML_scene'>"}
         end_switch = {
-            b"block": "</p>\n",
-            b"actor": "</span>",
-            b"dialog": "</span></p>\n",
-            b"inline_dir": "</span>",
-            b"act": "</h3>\n",
-            b"scene": "</h4>"}
+            b"block": b"</p>\n",
+            b"actor": b"</span>",
+            b"dialog": b"</span></p>\n",
+            b"inline_dir": b"</span>",
+            b"act": b"</h3>\n",
+            b"scene": b"</h4>"}
         # if this doesn't make a convincing case for a switch statement in python
         # then I don't know one
         while state is not end:
@@ -99,14 +97,14 @@ def sink(metadata, file_obj):
                     
             elif event is data:
                 if value == "\n":
-                    write("<br />")
+                    write(b"<br />")
                 else:
-                    write(" ")
+                    write(b" ")
                     write(value.encode(b"utf-8"))
             state, event, value = (yield)
         
-        write("\n</body>")
-        while state == b"end":
+        write(b"\n</body>")
+        while state is end:
             state, event, value = (yield)
 
     except GeneratorExit:

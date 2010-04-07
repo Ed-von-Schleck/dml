@@ -53,7 +53,7 @@ def broadcast(metadata, sinks):
                 try:
                     send = sink.cor.send
 
-                    if last_state != state:
+                    if last_state is not state:
                         if state in states[last_state][0]:
                             # the new state is child of the last one
                             send((state, b"start", None))

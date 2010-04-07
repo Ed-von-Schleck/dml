@@ -10,11 +10,10 @@ Before 0.1 Release Attempt:
  * get an online presence for users (for devs github is enough)
  * make HTML-sink to be able to release just the body (no boilertplate)
  * write pdf sink
- * write latex sink
- * write latex2pdf postprocessor
  * doublecheck MANUAL
  * make lexer not have 'filename', 'file_obj' but 'metadata'
  * write a lilypond macro
+ * a 'registry' for macros and sinks
  
 Possibly After 0.1 Release, But Then As Fast As Possible:
  * write docs for developers, esp. some nice state machine graphs

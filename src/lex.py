@@ -14,7 +14,6 @@ from __future__ import print_function
 
 from collections import deque, namedtuple
 from contextlib import nested
-from array import array
 
 from src.dmlparser import parser_entry, parser_manager
 from macros import macros
@@ -57,19 +56,19 @@ class DmlLex(object):
     def run(self, broadcaster, metadata):
         special_chars = self._special_chars
         whitespace = self._whitespace
+        current_token = []      # faster than deque() and array(b'u')
+        current_token_append = current_token.append
         concenate = "".join
         pos = self.pos
         with nested(parser_manager(parser_entry, broadcaster),
                     parser_manager(macro_dispatch, broadcaster, metadata, self)) as (entry, dispatch):
-            #entry("\n")                     # new file is like newline, isn't it?
+            entry("\n")                     # new file is like newline, isn't it?
             while True:
                 read = self._file_obj.read  # can be changed by push/pop_source
                 current_char = read(1)
-                
                 pos += 1
-                self.pos = pos              # likewise
-                current_token = []          # faster than deque(), I tested it
-                current_token_append = current_token.append
+                self.pos = pos              # might be pushed to stack
+                del current_token[:]
                 while current_char or self._source_stack:
                     if not current_char:
                         if current_token:
@@ -77,24 +76,22 @@ class DmlLex(object):
                         entry("\n")
                         self.pop_source()
                         break
-                    if current_char in whitespace:
+                    elif current_char in whitespace:
                         if current_token:
                             entry(concenate(current_token))
                         break
-                    if current_char in special_chars:
+                    elif current_char in special_chars:
                         if current_token:
                             entry(concenate(current_token))
                         if current_char == "\\":     # handle escapes
-                            slash = current_char
-                            current_char = read(1)
-                            if current_char not in "#@":
-                                entry(slash)
-                        if current_char == "\n":
+                            # TODO
+                            pass
+                        elif current_char == "\n":
                             self.lineno += 1
                             pos = 0
                         entry(current_char)
                         break
-                    if current_char == '#':
+                    elif current_char == '#':
                         if current_token:
                             entry(concenate(current_token))
                         self._file_obj.readline()
@@ -102,7 +99,7 @@ class DmlLex(object):
                         pos = 0
                         entry("\n")
                         break
-                    if current_char == '@':
+                    elif current_char == '@':
                         if current_token:
                             entry(concenate(current_token))
                         dispatch(self._file_obj.readline())
@@ -110,10 +107,10 @@ class DmlLex(object):
                         pos = 0
                         entry("\n")
                         break
-
-                    current_token_append(current_char)
-                    current_char = read(1)
-                    pos += 1
+                    else:
+                        current_token_append(current_char)
+                        current_char = read(1)
+                        pos += 1
                 else:
                     broadcaster.send((b"end", None))
                     break
@@ -122,7 +119,7 @@ def macro_dispatch(broadcaster, metadata, lexer):
     """
     the macro dispatcher
     
-    It first makes a list of all available macros. When a string is sent, it
+    It first makes a list of all available macros. When a raw string is sent, it
     resolves the macro name and calls the macro (a function, not a coroutine)
     with the rest of the string.
     """

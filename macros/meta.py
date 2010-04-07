@@ -5,7 +5,7 @@ from __future__ import unicode_literals
 
 from src.dmlexceptions import DMLError
 
-    
+
 class Meta(object):
     def __init__(self, broadcaster, metadata, lexer):
         self.broadcaster = broadcaster

@@ -254,14 +254,14 @@ def sink(metadata, file_obj):
                     tag = []
                 elif event is data:
                     tag.append(value)
-                elif event is end
+                elif event is end:
                     current_tag = " ".join(tag)
             elif state == b"title_value":
                 if event is start:
                     val = []
                 elif event is data:
                     val.append(value)
-                elif event is end
+                elif event is end:
                     attribs[current_tag] = " ".join(val)
                     del val
             elif state == b"title_block":
@@ -269,7 +269,7 @@ def sink(metadata, file_obj):
                     block = []
                 elif event is data:
                     block.append(value)
-                elif event is end
+                elif event is end:
                     attribs["blocks"].append(" ".join(block))
                     del block
                     
@@ -301,7 +301,7 @@ def sink(metadata, file_obj):
                     act = []
                 elif event is data:
                     act.append(value)
-                elif event is end
+                elif event is end:
                     layout = page_manager.create_layout()
                     layout.alignment = pango.ALIGN_CENTER
                     layout.set_markup("<span size='x-large'>" + " ".join(act) + "</span>")
@@ -311,7 +311,7 @@ def sink(metadata, file_obj):
                     scene = []
                 elif event is data:
                     scene.append(value)
-                elif event is end
+                elif event is end:
                     layout = page_manager.create_layout()
                     layout.alignment = pango.ALIGN_CENTER
                     layout.set_markup("\n<span size='large'>" + " ".join(scene) + "</span>")
@@ -321,10 +321,10 @@ def sink(metadata, file_obj):
                     layout = page_manager.create_layout()
                 elif event is data:
                     layout.add_markup("<span style='oblique'>" + value + "</span>")
-                elif event is end
+                elif event is end:
                     layout.finish()
             elif state == b"empty_line":
-                if event is end
+                if event is end:
                     layout = page_manager.create_layout()
                     layout.text = ""
                     layout.finish()
@@ -334,23 +334,21 @@ def sink(metadata, file_obj):
                     dialog_layout.indent = -20
                 elif event is data:
                     dialog_layout.add_markup("<span weight='bold'>" + value + "</span> ")
-                elif event is end
+                elif event is end:
                     pass
             elif state == b"dialog":
                 if event is start:
-                    #dialog = []
                     pass
                 elif event is data:
-                    #dialog.append(value)
                     dialog_layout.add_markup(value)
-                elif event is end
+                elif event is end:
                     dialog_layout.finish()
             elif state == b"inline_dir":
                 if event is start:
                     pass
                 elif event is data:
                      dialog_layout.add_markup("<span style='oblique'>" + value + "</span>")
-                elif event is end
+                elif event is end:
                     pass
                     
             state, event, value = (yield)
