@@ -60,7 +60,7 @@ class DmlLex(object):
         current_token_append = current_token.append
         concenate = "".join
         pos = self.pos
-        with nested(parser_manager(parser_entry, broadcaster),
+        with nested(parser_manager(parser_entry, broadcaster.send),
                     parser_manager(macro_dispatch, broadcaster, metadata, self)) as (entry, dispatch):
             entry("\n")                     # new file is like newline, isn't it?
             while True:

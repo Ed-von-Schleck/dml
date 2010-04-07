@@ -38,7 +38,6 @@ if __name__ == '__main__':
         pass
     option_parser = OptionParser(usage="dml [options] FILE")
     add_option = option_parser.add_option
-    #sink_mods = [sinks.__dict__[mod] for mod in sinks.__all__]
     for sinkname, sink in sinks.items():
         add_option("--" + sinkname,
                    dest=sinkname, action="store_true",
